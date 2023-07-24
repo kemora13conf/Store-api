@@ -1,4 +1,5 @@
-import { Schema, model, models, ObjectId } from 'mongoose'
+import mongoose from 'mongoose'
+const { Schema, model, models, ObjectId } = mongoose
 
 const schema = new Schema({
     amount: Number,
@@ -7,7 +8,10 @@ const schema = new Schema({
         type: ObjectId,
         ref: "Product"
     },
-
+    order: {
+        type: ObjectId,
+        ref: "Order"
+    }
 },
 {
     timestamps: true

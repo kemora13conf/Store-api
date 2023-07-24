@@ -5,8 +5,8 @@
   "description": "This is an api that is suitable for any e-commerce project",
   "main": "Runner.js",
   "scripts": {
-    "start": "node api.js",
-    "dev": "nodemon api.js",
+    "start": "node Runner.js",
+    "dev": "nodemon Runner.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -20,6 +20,8 @@
   },
   "homepage": "https://github.com/abdo487/Store_api#readme",
   "dependencies": {
+    "crypto-js": "^4.1.1",
+    "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "mongoose": "^7.4.0",
     "nodemon": "^3.0.1"

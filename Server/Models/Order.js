@@ -1,4 +1,5 @@
-import { Schema, model, models, ObjectId } from 'mongoose'
+import mongoose from 'mongoose'
+const { Schema, model, models, ObjectId } = mongoose
 
 const schema = new Schema({
     transaction_id: String,

@@ -1,4 +1,6 @@
-import { Schema, model, models, ObjectId } from 'mongoose'
+import mongoose from 'mongoose'
+const { Schema, model, models, ObjectId } = mongoose
+import CryptoJS from 'crypto-js';
 
 const schema = new Schema({
     fullname: {
@@ -16,16 +18,15 @@ const schema = new Schema({
         minLength: 3,
         maxLength: 50,
     },
-    password: {
-        type: String,
-        required: true,
-    },
     phone: String,
     image: {
         type: String,
         default: 'user-default.png'
     },
-    password: String,
+    password: {
+        type: String,
+        required: true,
+    },
     salt: String
 },
 {
@@ -33,14 +34,14 @@ const schema = new Schema({
 })
 
 // Pre-save middleware to encrypt the password
-usersSchema.pre('save', function(next) {
+schema.pre('save', function(next) {
     if (this.isModified('password')) {
       const encryptedPassword = CryptoJS.AES.encrypt(this.password, process.env.JWT_SECRET).toString();
       this.password = encryptedPassword;
     }
     next();
   });
-usersSchema.methods = { 
+schema.methods = { 
     // Method to decrypt the password
     authenticate: function(password) {
         const encryptedPassword = CryptoJS.AES.encrypt(password, process.env.JWT_SECRET).toString();

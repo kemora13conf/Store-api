@@ -1,9 +1,14 @@
-import { Schema, model, models, ObjectId } from 'mongoose'
+import mongoose from 'mongoose'
+const { Schema, model, models, ObjectId } = mongoose
 
 const schema = new Schema({
     name: String,
     src: String,
-    parent: ObjectId
+    parent: ObjectId,
+    client: {
+        type: ObjectId,
+        ref: "Client"
+    }
 },
 {
     timestamps: true
