@@ -1,6 +1,7 @@
 import mongoose from 'mongoose'
 const { Schema, model, models, ObjectId } = mongoose
 import CryptoJS from 'crypto-js';
+import { v4 as uuidv4 } from 'uuid';
 
 const schema = new Schema({
     fullname: {
@@ -27,7 +28,10 @@ const schema = new Schema({
         type: String,
         required: true,
     },
-    salt: String
+    salt: {
+        type: String,
+        default: uuidv4()
+    }
 },
 {
     timestamps: true
@@ -36,16 +40,17 @@ const schema = new Schema({
 // Pre-save middleware to encrypt the password
 schema.pre('save', function(next) {
     if (this.isModified('password')) {
-      const encryptedPassword = CryptoJS.AES.encrypt(this.password, process.env.JWT_SECRET).toString();
-      this.password = encryptedPassword;
+        const encryptedInputPassword = CryptoJS.SHA256(this.password + this.salt).toString();   
+        this.password = encryptedInputPassword;
     }
     next();
   });
-schema.methods = { 
-    // Method to decrypt the password
-    authenticate: function(password) {
-        const encryptedPassword = CryptoJS.AES.encrypt(password, process.env.JWT_SECRET).toString();
-        return this.password == encryptedPassword;
+schema.methods = {
+    // Method to compare and authenticate the password
+    authenticate: function(text) {
+        const encryptedInputPassword = CryptoJS.SHA256(text + this.salt).toString(); 
+        console.log(encryptedInputPassword, ' ', this.password)
+        return this.password === encryptedInputPassword;
     },
 };
 

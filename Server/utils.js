@@ -1,6 +1,6 @@
 const response = (type, message, other=null)=>{
     let obj = {
-        tyep: type,
+        type: type,
         message: message,
         data: other
     }

@@ -1,9 +1,18 @@
 import { Router } from 'express'
-import { all, create } from './Controller.js'
+import { clientById, all, create, verifyInputs, upload, update, verifyUPdateInputs,client } from './Controller.js'
+import { signinRequired } from '../Auth/Controller.js';
 
 const router = new Router();
 
+// Decalaring the params
+router.param('clientId', clientById)
+
+// Declaring the routes
 router.get('/', all)
-router.post('/create-account', create)
+router.post('/create-account', upload.single('image'), verifyInputs, create)
+router.put('/:clientId/update-account', signinRequired, upload.single('image'), verifyUPdateInputs, update)
+router.get('/:clientId', client)
+
+
 
 export default router;
