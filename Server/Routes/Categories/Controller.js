@@ -10,6 +10,14 @@ const list = async (req, res) => {
     }
 }
 
+const create = (req, res)=>{
+    try {
+            
+    } catch (error) {
+        res.status(500).json(response('error', 'Something Went wrong while fetching categories. Try agin later'))
+    }
+}
+
 export {
     list
 }
