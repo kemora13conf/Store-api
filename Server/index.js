@@ -25,16 +25,18 @@ const __dirname = dirname(__filename);
 
 // Handling midlwares
 app.use(express.json())
-app.use('/profile-images', express.static(path.join(__dirname, './../Public/Profile-images')));
+app.use('/assets', express.static(path.join(__dirname, './../Public/')));
 
 // Importing the routes
 import clientRouter from './Routes/Client/index.js'
 import authRouter from './Routes/Auth/index.js'
+import categoryRouter from './Routes/Categories/index.js'
 import { response } from './utils.js';
 
 // Using the routes
-app.use('/api/clients', clientRouter)
 app.use('/api/auth', authRouter)
+app.use('/api/clients', clientRouter)
+app.use('/api/categories', categoryRouter)
 
 app.use('/*', (req, res)=>{
     res.json(response('Not Found', 'This endpoint does not exist'))

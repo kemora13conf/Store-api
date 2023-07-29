@@ -4,7 +4,6 @@ const { Schema, model, models, ObjectId } = mongoose
 const schema = new Schema({
     name: String,
     src: String,
-    parent: ObjectId,
     client: {
         type: ObjectId,
         ref: "Client"

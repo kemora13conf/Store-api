@@ -10,7 +10,11 @@ const schema = new Schema({
             type: ObjectId,
             ref: "Image"
         }
-    ]
+    ],
+    client: {
+        type: ObjectId,
+        ref: "Client"
+    }
 },
 {
     timestamps: true
