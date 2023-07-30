@@ -48,11 +48,15 @@ function isEmail(email) {
 
 const verifyInputs = async (req, res, next)=>{
     const { fullname, email, phone, password, re_password } = req.body;
-    if (!fullname || !email || !phone || !password) return res.status(400).json(response('input', 'This field is required'))
+    if (!fullname) return res.status(400).json(response('fullname', 'This field is required'))
+    if (!email) return res.status(400).json(response('email', 'This field is required'))
+    if (!phone) return res.status(400).json(response('phone', 'This field is required'))
+    if (!password) return res.status(400).json(response('password', 'This field is required'))
+    if (!re_password) return res.status(400).json(response('re_password', 'This field is required'))
     if(fullname.length < 3 || fullname.length > 20) return res.status(400).json(response('fullname', 'Fullname must be between 3 and 20 characters'))
     if(phone.length < 9 || phone.length > 15) return res.status(400).json(response('phone', 'Please enter a valid phone number'))
-    if(password !== re_password) return res.status(400).json(response('re_password', 'Password does not match'))
     if(password.length < 6 || password.length > 20) return res.status(400).json(response('password', 'Password must be between 6 and 20 characters'))
+    if(password !== re_password) return res.status(400).json(response('re_password', 'Password does not match'))
     if (!isEmail(email)) return res.status(400).json(response('email', 'Invalid email address'))
     const client = await Client.findOne({ email });
     if (client) return res.status(400).json(response('email', 'Email already exists'))
@@ -74,10 +78,12 @@ const create = async (req, res)=>{
 }
 const verifyUPdateInputs = async (req, res, next)=>{
     const { fullname, email, phone } = req.body;
-    if (!fullname || !email || !phone) return res.status(400).json(response('input', 'This field is required'))
+    if (!fullname) return res.status(400).json(response('fullname', 'This field is required'))
+    if (!email) return res.status(400).json(response('email', 'This field is required'))
+    if (!phone) return res.status(400).json(response('phone', 'This field is required'))
     if(fullname.length < 3 || fullname.length > 20) return res.status(400).json(response('fullname', 'Fullname must be between 3 and 20 characters'))
-    if(phone.length < 9 || phone.length > 15) return res.status(400).json(response('phone', 'Please enter a valid phone number'))
     if (!isEmail(email)) return res.status(400).json(response('email', 'Invalid email address'))
+    if(phone.length < 9 || phone.length > 15) return res.status(400).json(response('phone', 'Please enter a valid phone number'))
     if(req.client.email != email){
         const client = await Client.findOne({ email });
         if (client) return res.status(400).json(response('email', 'This email already taken'))

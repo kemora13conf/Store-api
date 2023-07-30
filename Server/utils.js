@@ -7,4 +7,12 @@ const response = (type, message, other=null)=>{
     return obj;
 }
 
-export { response };
+const imagesHolder = async (req, res, next) => {
+    req.images = [];
+    next();
+} 
+
+export { 
+    response,
+    imagesHolder
+};
