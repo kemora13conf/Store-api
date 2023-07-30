@@ -31,6 +31,10 @@ const schema = new Schema({
     salt: {
         type: String,
         default: uuidv4()
+    },
+    role:{
+        type: Number,
+        default: 0,
     }
 },
 {

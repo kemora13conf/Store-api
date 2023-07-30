@@ -31,12 +31,14 @@ app.use('/assets', express.static(path.join(__dirname, './../Public/')));
 import clientRouter from './Routes/Client/index.js'
 import authRouter from './Routes/Auth/index.js'
 import categoryRouter from './Routes/Categories/index.js'
+import productRouter from './Routes/Products/index.js'
 import { response } from './utils.js';
 
 // Using the routes
 app.use('/api/auth', authRouter)
 app.use('/api/clients', clientRouter)
 app.use('/api/categories', categoryRouter)
+app.use('/api/products', productRouter)
 
 app.use('/*', (req, res)=>{
     res.json(response('Not Found', 'This endpoint does not exist'))

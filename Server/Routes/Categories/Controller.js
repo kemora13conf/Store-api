@@ -32,9 +32,10 @@ const storage = diskStorage({
         cb(null, path.join(path.resolve(),'Public/Images'));
     },
     filename: function (req, file, cb) {
+        const { images } = req;
         const ext = file.originalname.split('.')[1];
         const fileName = Date.now() + '.' + ext;
-        if (fileName) req.images = [...req.images, fileName]
+        if (fileName) req.images = [...images, fileName]
         cb(null, fileName);
     }
 })
@@ -97,7 +98,7 @@ const update = async (req, res, next) => {
             const imagesArr = images.map(image => {
                 return {
                     name: image,
-                    src: `/assets/Profile-images/${image}`,
+                    src: `/assets/Images/${image}`,
                     client: req.currentUser._id,
                 }
             })
