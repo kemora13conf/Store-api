@@ -18,5 +18,4 @@ router.post('/create-product', signinRequired, imagesHolder, upload.array('image
 router.put('/update-product/:productId', signinRequired, imagesHolder, upload.array('images'), verifyUpdateInputs, update)
 router.delete('/delete-product/:productId', signinRequired, remove)
 
-
 export default router;
