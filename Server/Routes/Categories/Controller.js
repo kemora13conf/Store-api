@@ -117,6 +117,16 @@ const update = async (req, res, next) => {
     }
 }
 
+const removeImage = async (req, res)=>{
+    try {
+        const { imageId } = req.body;
+        await Image.deleteOne({ _id: imageId });
+        res.status(200).json(response('success', 'Image is deleted!'))
+    } catch (error) {
+        res.status(500).json(response('error', 'Something Went wrong while deleting image. Try agin later ' + error.message))
+    }
+}
+
 const remove = async (req, res)=>{
     try {
         const { category } = req;
@@ -138,4 +148,5 @@ export {
     verifyUpdateInputs,
     update,
     remove,
+    removeImage,
 }

@@ -1,5 +1,5 @@
 import {Router} from 'express'
-import { list, create, upload, verifyInputs, verifyUpdateInputs, categoryById, update, remove } from './Controller.js';
+import { list, create, upload, verifyInputs, verifyUpdateInputs, categoryById, update, remove, removeImage } from './Controller.js';
 import { response, imagesHolder } from "../../utils.js"
 import { signinRequired } from "../Auth/Controller.js"
 
@@ -12,6 +12,7 @@ router.get('/:categoryId', (req, res)=>{ return res.status(200).json(response('s
 router.post('/create-category', signinRequired, imagesHolder, upload.array('images'), verifyInputs, create)
 router.put('/update-category/:categoryId', signinRequired, imagesHolder, upload.array('images'), verifyUpdateInputs, update)
 router.delete('/delete-category/:categoryId', signinRequired, remove)
+router.delete('/delete-image', signinRequired, removeImage)
 
 
 export default router;
