@@ -91,7 +91,7 @@ const verifyUpdateInputs = (req, res, next) => {
 }
 const update = async (req, res, next) => {
     try {
-        const { name, title, description } = req.body;
+        let { name, title, description, remove } = req.body;
         const { category, images } = req;
         let IMAGES = [];
         if(images.length != 0){
@@ -106,6 +106,12 @@ const update = async (req, res, next) => {
             IMAGES = IMAGES.map(image => image._id);
         }
         const updated_category = await Category.findOne({ _id: category._id });
+        if (remove.length != 0) {
+            remove = JSON.parse(remove);
+            remove.forEach((imageId) => {
+                updated_category.gallery = updated_category.gallery.filter(image => image != imageId);
+            });
+        }
         updated_category.name = name;
         updated_category.title = title;
         updated_category.description = description;
@@ -117,15 +123,15 @@ const update = async (req, res, next) => {
     }
 }
 
-const removeImage = async (req, res)=>{
-    try {
-        const { imageId } = req.body;
-        await Image.deleteOne({ _id: imageId });
-        res.status(200).json(response('success', 'Image is deleted!'))
-    } catch (error) {
-        res.status(500).json(response('error', 'Something Went wrong while deleting image. Try agin later ' + error.message))
-    }
-}
+// const removeImage = async (req, res)=>{
+//     try {
+//         const { imageId } = req.body;
+//         await Image.deleteOne({ _id: imageId });
+//         res.status(200).json(response('success', 'Image is deleted!'))
+//     } catch (error) {
+//         res.status(500).json(response('error', 'Something Went wrong while deleting image. Try agin later ' + error.message))
+//     }
+// }
 
 const remove = async (req, res)=>{
     try {
@@ -148,5 +154,4 @@ export {
     verifyUpdateInputs,
     update,
     remove,
-    removeImage,
 }
