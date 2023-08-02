@@ -89,7 +89,7 @@ const verifyUpdateInputs = (req, res, next) => {
     if(description.length < 3) return res.status(400).json(response('description', 'Description must be atleast 3 characters long'))
     next();
 }
-const update = async (req, res, next) => {
+const update = async (req, res) => {
     try {
         let { name, title, description, remove } = req.body;
         const { category, images } = req;
@@ -106,11 +106,18 @@ const update = async (req, res, next) => {
             IMAGES = IMAGES.map(image => image._id);
         }
         const updated_category = await Category.findOne({ _id: category._id });
-        if (remove.length != 0) {
-            remove = JSON.parse(remove);
-            remove.forEach((imageId) => {
-                updated_category.gallery = updated_category.gallery.filter(image => image != imageId);
-            });
+        if (typeof remove != undefined) {
+            if(typeof remove == 'string'){
+                updated_category.gallery = updated_category.gallery.filter(image => image != remove);
+            }
+            else if(typeof remove == 'object'){
+                remove.forEach((imageId) => {
+                    updated_category.gallery = updated_category.gallery.filter(image => image != imageId);
+                });
+            }
+            else{
+                return res.status(400).json(response('error', 'The input type of remove must be valid string or array'))
+            }
         }
         updated_category.name = name;
         updated_category.title = title;

@@ -104,9 +104,9 @@ const verifyUpdateInputs = (req, res, next) => {
     if(quantity <= 0) return res.status(400).json(response('quantity', 'Please enter a valid quantity.'))
     next();
 }
-const update = async (req, res, next) => {
+const update = async (req, res) => {
     try {
-        const { name, description, price, quantity, category } = req.body;
+        const { name, description, price, quantity, category, remove } = req.body;
         const { product, images } = req;
         let IMAGES = [];
         if(images.length != 0){
@@ -121,6 +121,19 @@ const update = async (req, res, next) => {
             IMAGES = IMAGES.map(image => image._id);
         }
         const updated_product = await Product.findOne({ _id: product._id });
+        if (typeof remove != undefined) {
+            if(typeof remove == 'string'){
+                updated_product.gallery = updated_product.gallery.filter(image => image != remove);
+            }
+            else if(typeof remove == 'object'){
+                remove.forEach((imageId) => {
+                    updated_product.gallery = updated_product.gallery.filter(image => image != imageId);
+                });
+            }
+            else{
+                return res.status(400).json(response('error', 'The input type of remove must be valid string or array'))
+            }
+        }
         updated_product.name = name;
         updated_product.description = description;
         updated_product.price = price;
