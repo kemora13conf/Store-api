@@ -35,7 +35,15 @@ const schema = new Schema({
     role:{
         type: Number,
         default: 0,
-    }
+    },
+    theme:{
+        type: String,
+        default: 'light',
+    },
+    status:{
+        type: Number,
+        default: 0,
+    },
 },
 {
     timestamps: true

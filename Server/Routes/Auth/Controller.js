@@ -30,10 +30,11 @@ const verifyInputs = async (req, res, next) => {
 
 const signin = async (req, res) => {
     const { email, password } = req.body;
-    const client = await Client.findOne({ email: email });
+    const client = await Client.findOne({ email: email});
     if (!client) return res.status(401).json(response('email', 'This email is not registered'))
     const match = client.authenticate(password);
     if (!match) return res.status(401).json(response('password', 'Incorrect password'))
+    if (client.role == 0) return res.status(401).json(response('no_login', 'You must be logged in to access this route'))
     const token = jwt.sign({ _id: client._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
     client.password = null;
     client.salt = null;

@@ -130,15 +130,6 @@ const update = async (req, res) => {
     }
 }
 
-// const removeImage = async (req, res)=>{
-//     try {
-//         const { imageId } = req.body;
-//         await Image.deleteOne({ _id: imageId });
-//         res.status(200).json(response('success', 'Image is deleted!'))
-//     } catch (error) {
-//         res.status(500).json(response('error', 'Something Went wrong while deleting image. Try agin later ' + error.message))
-//     }
-// }
 
 const remove = async (req, res)=>{
     try {
@@ -151,6 +142,17 @@ const remove = async (req, res)=>{
         res.status(500).json(response('error', 'Something Went wrong while deleting category. Try agin later ' + error.message))
     }
 }
+const changeState = async (req, res)=>{
+    try {
+        const { state } = req.body;
+        const { category } = req;
+        category.enabled = state;
+        await category.save();
+        res.status(200).json(response('success', 'Category is enabled!', category))
+    } catch (error) {
+        res.status(500).json(response('error', 'Something Went wrong while enabling category. Try agin later ' + error.message))
+    }
+}
 
 export {
     categoryById,
@@ -161,4 +163,5 @@ export {
     verifyUpdateInputs,
     update,
     remove,
+    changeState
 }

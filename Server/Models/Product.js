@@ -6,6 +6,10 @@ const schema = new Schema({
     description: String,
     price: Number,
     quantity: Number,
+    enabled: {
+        type: Boolean,
+        default: true
+    },
     category: {
         type: ObjectId,
         ref: "Category"

@@ -117,6 +117,21 @@ const client = async (req, res)=>{
         )
     }
 }
+const updateTheme = async (req, res)=>{
+    try {
+        const { currentUser } = req;
+        const client = await Client.findOneAndUpdate({ _id: currentUser._id }, { theme: req.body.theme }, { new: true });
+        res.status(200).json(response('success', 'Client fetched!', client.theme))
+    } catch (err) {
+        res.status(500).json(
+            response(
+                'error',
+                'Something Went wrong while fetching user. Try agin later'
+            )
+        )
+        console.log(err.message)
+    }
+}
 
 export { 
     clientById,
@@ -126,5 +141,6 @@ export {
     upload, 
     update, 
     verifyUPdateInputs,
-    client
+    client,
+    updateTheme
 }

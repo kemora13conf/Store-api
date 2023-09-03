@@ -1,5 +1,6 @@
 import express from 'express';
 import mongoose from 'mongoose';
+import Cors from 'cors';
 import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
 import Config from 'dotenv';
@@ -25,7 +26,27 @@ const __dirname = dirname(__filename);
 
 // Handling midlwares
 app.use(express.json())
+const options = {
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: '*'
+}
+app.use(Cors(options))
 app.use('/assets', express.static(path.join(__dirname, './../Public/')));
+app.use((req, res, next) => {
+  console.log(
+    "Coming : [ " +
+      req.method +
+      " Request ] " +
+      res.statusCode +
+      " " +
+      req.url +
+      " [ " +
+      new Date().toDateString() +
+      " ]"
+  );
+  next();
+});
 
 // Importing the routes
 import clientRouter from './Routes/Client/index.js'

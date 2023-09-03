@@ -5,6 +5,10 @@ const schema = new Schema({
     name: String,
     title: String,
     description: String,
+    enabled: {
+        type: Boolean,
+        default: true   
+    },
     gallery: [
         {
             type: ObjectId,
