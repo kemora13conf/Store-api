@@ -1,0 +1,59 @@
+body{
+    @apply bg-light-secondary-100 dark:bg-dark-primary-500;
+}
+
+
+.nav-btn{
+    width: 35px;
+    height: 35px;
+    padding: 3px;
+    background: transparent;
+    cursor: pointer;
+    /* display: flex; */ /* actually this comes from the tailwind that's why it's commented */
+    flex-direction: column;
+    transition: all 300ms ease-in-out;
+}
+.nav-btn span{
+    position: relative;
+    width: 100%;
+    height: 2px;
+    background: #000;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: all 300ms ease-in-out;
+}
+.nav-btn span::before{
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background: #000;
+    left: 0;
+    top: -10px;
+    transition: all 300ms ease-in-out;
+}
+.nav-btn span::after{
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background: #000;
+    left: 0;
+    top: 10px;
+    transition: all 300ms ease-in-out;
+}
+.nav-btn.active{
+    rotate: 90deg;
+}
+.nav-btn.active span{
+    background: transparent;
+}
+.nav-btn.active span::before{
+    top: 0;
+    transform: rotate(45deg);
+}
+.nav-btn.active span::after{
+    top: 0;
+    transform: rotate(-45deg);
+}
