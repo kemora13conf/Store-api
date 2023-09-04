@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import React, { useContext, useEffect } from "react";
 import { toast } from "react-toastify";
 import { AppContext } from "../../App";
+import { nanoid } from "nanoid";
 
 export default function Login() {
   const { setIsAuth, setCurrentUser, setLoaded } = useContext(AppContext);

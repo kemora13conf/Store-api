@@ -22,6 +22,7 @@ const AppProvider = ({ children }) => {
   const [loaded, setLoaded] = useState(false);
   const [reqFinished, setReqFinished] = useState(false);
   const [theme, setTheme] = useState('light')
+  const [ profileMenu, setProfileMenu ] = useState(false)
 
   const stateStore = {
     activeTab,
@@ -35,7 +36,9 @@ const AppProvider = ({ children }) => {
     reqFinished,
     setReqFinished,
     theme,
-    setTheme
+    setTheme,
+    profileMenu,
+    setProfileMenu,
   };
 
   async function checkAuth() {

