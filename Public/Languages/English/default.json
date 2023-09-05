@@ -1,4 +1,4 @@
-let keys = {
+{
     "dashboard": "Dashboard",
     
     "categories": "Categories",
@@ -48,5 +48,3 @@ let keys = {
     "choose_images": "Choose images",
     "choose_image": "Choose image"
 }
-
-export default keys;
