@@ -44,6 +44,10 @@ const schema = new Schema({
         type: Number,
         default: 0,
     },
+    language:{
+        type: String,
+        default: 'English',
+    },
 },
 {
     timestamps: true

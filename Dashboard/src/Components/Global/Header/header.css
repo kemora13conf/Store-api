@@ -1,6 +1,0 @@
-.reveal{
-    @apply bg-light-primary-500 shadow dark:bg-dark-primary-800;
-}
-.activeTab{
-    @apply bg-light-secondary-500 shadow dark:bg-dark-primary-600 font-medium;
-}
