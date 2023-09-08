@@ -48,6 +48,12 @@ const schema = new Schema({
         type: String,
         default: 'English',
     },
+    permissions: [
+        {
+            type: ObjectId,
+            ref: "Permissions"
+        }
+    ],
 },
 {
     timestamps: true

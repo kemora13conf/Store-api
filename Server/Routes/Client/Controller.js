@@ -132,6 +132,20 @@ const updateTheme = async (req, res)=>{
         console.log(err.message)
     }
 }
+const updateLanguage = async (req, res)=>{
+    try {
+        const { currentUser } = req;
+        const client = await Client.findOneAndUpdate({ _id: currentUser._id }, { language  : req.body.language }, { new: true });
+        res.status(200).json(response('success', 'Client fetched!', client.language))
+    } catch (err) {
+        res.status(500).json(
+            response(
+                'error',
+                'Something Went wrong while fetching user. Try agin later'
+            )
+        )
+    }
+}
 
 export { 
     clientById,
@@ -142,5 +156,6 @@ export {
     update, 
     verifyUPdateInputs,
     client,
-    updateTheme
+    updateTheme,
+    updateLanguage
 }
