@@ -47,5 +47,7 @@
     "old_images_preview": "Old images preview",
     "images_preview": "Images preview",
     "choose_images": "Choose images",
-    "choose_image": "Choose image"
+    "choose_image": "Choose image",
+    "id": "ID",
+    "image": "Image"
 }

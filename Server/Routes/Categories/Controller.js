@@ -7,7 +7,9 @@ import Product from "../../Models/Product.js";
 
 const categoryById = async (req, res, next, id) => {
     try {
-        const category = await Category.findOne({ _id: id });
+        const category = await Category.findOne({ _id: id })
+            .populate('gallery')
+            .populate('client', 'fullname email phone image');
         if (!category) return res.status(404).json(response('error', 'Category not found!'))
         req.category = category;
         next();
@@ -17,11 +19,24 @@ const categoryById = async (req, res, next, id) => {
 }
 
 const list = async (req, res) => {
+    const { search, page, limit } = req.query;
+
     try {
-        const categories = await Category.find({})
-            .populate('gallery')
-            .populate('client', 'fullname email phone image');
-        res.status(200).json(response('success', 'All categories are fetched!', categories))
+        let categories = [];
+        if (search) {
+            categories = await Category.find({ name: { $regex: search, $options: 'i' } })
+                .populate('gallery')
+                .populate('client', 'fullname email phone image');
+        }else{
+            categories = await Category.find({})
+                .populate('gallery')
+                .populate('client', 'fullname email phone image');
+        }
+        const total = categories.length;
+        const pages = Math.ceil(total / limit);
+        const offset = (page - 1) * limit;
+        categories = categories.slice(offset, offset + limit);
+        res.status(200).json(response('success', 'All categories are fetched!', { categories, total, pages }))
     } catch (error) {
         res.status(500).json(response('error', 'Something Went wrong while fetching categories. Try agin later'))
     }
@@ -33,8 +48,9 @@ const storage = diskStorage({
     },
     filename: function (req, file, cb) {
         const { images } = req;
-        const ext = file.originalname.split('.')[1];
-        const fileName = Date.now() + '.' + ext;
+        const nameArr = file.originalname.split('.');
+        const ext = nameArr[nameArr.length - 1];
+        const fileName = 'Categories'+Date.now() + '.' + ext;
         if (fileName) req.images = [...images, fileName]
         cb(null, fileName);
     }
@@ -106,12 +122,11 @@ const update = async (req, res) => {
             IMAGES = IMAGES.map(image => image._id);
         }
         const updated_category = await Category.findOne({ _id: category._id });
+        console.log('remove', typeof remove)
         if (typeof remove != undefined) {
             if(typeof remove == 'string'){
-                updated_category.gallery = updated_category.gallery.filter(image => image != remove);
-            }
-            else if(typeof remove == 'object'){
-                remove.forEach((imageId) => {
+                const arr = remove.split(',');
+                arr.forEach((imageId) => {
                     updated_category.gallery = updated_category.gallery.filter(image => image != imageId);
                 });
             }
@@ -123,6 +138,7 @@ const update = async (req, res) => {
         updated_category.title = title;
         updated_category.description = description;
         updated_category.gallery = [...updated_category.gallery, ...IMAGES]
+        await updated_category.populate('gallery');
         await updated_category.save()
         res.status(200).json(response('success', 'Category is updated!', updated_category))
     } catch (error) {
