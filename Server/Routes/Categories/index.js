@@ -1,5 +1,5 @@
 import {Router} from 'express'
-import { list, create, upload, verifyInputs, verifyUpdateInputs, categoryById, update, remove, changeState } from './Controller.js';
+import { list, create, upload, verifyInputs, verifyUpdateInputs, categoryById, update, remove, changeState, deleteMultiple } from './Controller.js';
 import { response, imagesHolder } from "../../utils.js"
 import { signinRequired } from "../Auth/Controller.js"
 
@@ -13,6 +13,7 @@ router.post('/create-category', signinRequired, imagesHolder, upload.array('imag
 router.put('/update-category/:categoryId', signinRequired, imagesHolder, upload.array('images'), verifyUpdateInputs, update)
 router.put('/change-state-category/:categoryId', signinRequired, changeState)
 router.delete('/delete-category/:categoryId', signinRequired, remove)
+router.post('/delete-multiple-categories', signinRequired, deleteMultiple)
 
 
 export default router;

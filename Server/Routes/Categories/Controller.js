@@ -20,7 +20,6 @@ const categoryById = async (req, res, next, id) => {
 
 const list = async (req, res) => {
     const { search, page, limit } = req.query;
-
     try {
         let categories = [];
         if (search) {
@@ -35,7 +34,7 @@ const list = async (req, res) => {
         const total = categories.length;
         const pages = Math.ceil(total / limit);
         const offset = (page - 1) * limit;
-        categories = categories.slice(offset, offset + limit);
+        limit ? categories = categories.slice(offset, offset + limit) : '';
         res.status(200).json(response('success', 'All categories are fetched!', { categories, total, pages }))
     } catch (error) {
         res.status(500).json(response('error', 'Something Went wrong while fetching categories. Try agin later'))
@@ -146,7 +145,7 @@ const update = async (req, res) => {
     }
 }
 
-
+// delete category
 const remove = async (req, res)=>{
     try {
         const { category } = req;
@@ -158,6 +157,22 @@ const remove = async (req, res)=>{
         res.status(500).json(response('error', 'Something Went wrong while deleting category. Try agin later ' + error.message))
     }
 }
+
+// delete multiple categories
+const deleteMultiple = async (req, res)=>{
+    try {
+        const { ids } = req.body;
+        const categories = await Category.find({ _id: { $in: ids } });
+        const products = await Product.find({ category: { $in: ids } });
+        if (products.length != 0) return res.status(400).json(response('error', 'Some categories are used in some products. Delete those products first.'));
+        await Category.deleteMany({ _id: { $in: ids } });
+        res.status(200).json(response('success', 'Categories are deleted!'))
+    } catch (error) {
+        res.status(500).json(response('error', 'Something Went wrong while deleting categories. Try agin later ' + error.message))
+    }
+}
+
+// change state
 const changeState = async (req, res)=>{
     try {
         const { state } = req.body;
@@ -179,5 +194,6 @@ export {
     verifyUpdateInputs,
     update,
     remove,
+    deleteMultiple,
     changeState
 }
