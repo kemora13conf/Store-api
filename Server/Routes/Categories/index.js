@@ -12,7 +12,7 @@ router.get('/:categoryId', (req, res)=>{ return res.status(200).json(response('s
 router.post('/create-category', signinRequired, imagesHolder, upload.array('images'), verifyInputs, create)
 router.put('/update-category/:categoryId', signinRequired, imagesHolder, upload.array('images'), verifyUpdateInputs, update)
 router.put('/change-state-category/:categoryId', signinRequired, changeState)
-router.delete('/delete-category/:categoryId', signinRequired, remove)
+router.delete('/:categoryId', signinRequired, remove)
 router.post('/delete-multiple-categories', signinRequired, deleteMultiple)
 
 
