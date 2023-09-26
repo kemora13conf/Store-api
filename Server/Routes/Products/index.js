@@ -16,6 +16,6 @@ router.get('/:productId', (req, res)=>{return res.status(200).json(response('suc
 router.get('/by-category/:categoryById', productsByCategory)
 router.post('/create-product', signinRequired, imagesHolder, upload.array('images'), verifyInputs, create)
 router.put('/update-product/:productId', signinRequired, imagesHolder, upload.array('images'), verifyUpdateInputs, update)
-router.delete('/delete-product/:productId', signinRequired, remove)
+router.delete('/:productId', signinRequired, remove)
 
 export default router;

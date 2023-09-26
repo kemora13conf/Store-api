@@ -41,15 +41,38 @@ const list = async (req, res) => {
     }
 }
 
+// check if a value is in an array
+function isInArray(value, array){
+    let flag = 0;
+    array.forEach((item, index) => {
+        if(item == value){
+            flag++;
+        }
+    })
+    if(flag != 0 ){
+        return true;
+    }
+    return false
+}
+
 const storage = diskStorage({
     destination: function (req, file, cb) {
         cb(null, path.join(path.resolve(),'Public/Images'));
     },
     filename: function (req, file, cb) {
         const { images } = req;
-        const nameArr = file.originalname.split('.');
-        const ext = nameArr[nameArr.length - 1];
-        const fileName = 'Categories'+Date.now() + '.' + ext;
+        const ALLOWEDEXT = ['png','jpg', 'jpeg', 'webp']
+
+        // separating the name from the extension.
+        const nameArr = file.originalname.split('.'); // array: [name, ext]
+        const ext = nameArr[nameArr.length - 1]; // extension
+        
+        // checking the allowed filetypes
+        if(!isInArray(ext.toLocaleLowerCase(), ALLOWEDEXT)){
+            req.fileError = response('file', 'An authorized file format')
+        }
+
+        const fileName = 'Categories-' + Date.now() + '.' + ext;
         if (fileName) req.images = [...images, fileName]
         cb(null, fileName);
     }
@@ -62,8 +85,7 @@ const verifyInputs = (req, res, next)=>{
     if(!name) return res.status(400).json(response('name', 'This field is required'))
     if(!title) return res.status(400).json(response('title', 'This field is required'))
     if(!description) return res.status(400).json(response('description', 'This field is required'))
-    // console.log(images)
-    // if(images.length == 0) return res.status(400).json(response('images', 'Atleast one image required'))
+    if(images.length == 0) return res.status(400).json(response('file', 'Image is required required'))
     if(name.length < 3) return res.status(400).json(response('name', 'Name must be atleast 3 characters long'))
     if(title.length < 3) return res.status(400).json(response('title', 'Title must be atleast 3 characters long'))
     if(description.length < 3) return res.status(400).json(response('description', 'Description must be atleast 3 characters long'))
@@ -72,7 +94,14 @@ const verifyInputs = (req, res, next)=>{
 const create = async (req, res)=>{
     try {
         const { name, title, description } = req.body;
-        const { images } = req;
+        const { fileError, images } = req;
+        
+        // checking that there is nothing wrong with uploading files
+        if(fileError != undefined){
+            return res.status(400).json(fileError)
+        }
+
+        // setling the uploaded images array
         const imagesArr = images.map(image => {
             return {
                 name: image,
@@ -107,7 +136,14 @@ const verifyUpdateInputs = (req, res, next) => {
 const update = async (req, res) => {
     try {
         let { name, title, description, remove } = req.body;
-        const { category, images } = req;
+        const { category, fileError, images } = req;
+        
+        // checking that there is nothing wrong with uploading files
+        if(fileError != undefined){
+            return res.status(400).json(fileError)
+        }
+
+        // setling the uploaded images array
         let IMAGES = [];
         if(images.length != 0){
             const imagesArr = images.map(image => {
@@ -121,7 +157,6 @@ const update = async (req, res) => {
             IMAGES = IMAGES.map(image => image._id);
         }
         const updated_category = await Category.findOne({ _id: category._id });
-        console.log('remove', typeof remove)
         if (typeof remove != undefined) {
             if(typeof remove == 'string'){
                 const arr = remove.split(',');
@@ -133,14 +168,18 @@ const update = async (req, res) => {
                 return res.status(400).json(response('error', 'The input type of remove must be valid string or array'))
             }
         }
+
+        // updating the category with the new data
         updated_category.name = name;
         updated_category.title = title;
         updated_category.description = description;
         updated_category.gallery = [...updated_category.gallery, ...IMAGES]
+        
         await updated_category.populate('gallery');
         await updated_category.save()
         res.status(200).json(response('success', 'Category is updated!', updated_category))
     } catch (error) {
+        // this is beeing returned when something wrong happens
         res.status(500).json(response('error', 'Something Went wrong while updating category. Try agin later ' + error.message))
     }
 }
@@ -162,7 +201,6 @@ const remove = async (req, res)=>{
 const deleteMultiple = async (req, res)=>{
     try {
         const { ids } = req.body;
-        const categories = await Category.find({ _id: { $in: ids } });
         const products = await Product.find({ category: { $in: ids } });
         if (products.length != 0) return res.status(400).json(response('error', 'Some categories are used in some products. Delete those products first.'));
         await Category.deleteMany({ _id: { $in: ids } });
