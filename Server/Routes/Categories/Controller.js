@@ -17,15 +17,41 @@ const categoryById = async (req, res, next, id) => {
         res.status(500).json(response('error', 'Something Went wrong while fetching category. Try agin later'))
     }
 }
+function stringToAscii(str) {
+    const asciiArray = [];
+    
+    for (let i = 0; i < str.length; i++) {
+      const charCode = str.charCodeAt(i);
+      asciiArray.push(charCode);
+    }
+    
+    return asciiArray;
+  }
 
 const list = async (req, res) => {
-    const { search, page, limit } = req.query;
+    let { search, searchby, orderby, page, limit } = req.query;
+    page = parseInt(page);
+    limit = parseInt(limit);
+    searchby = searchby ? searchby.toLocaleLowerCase() : 'all';
+
     try {
         let categories = [];
         if (search) {
-            categories = await Category.find({ name: { $regex: search, $options: 'i' } })
+            if(searchby == 'all'){
+                categories = await Category.find({ 
+                    $or: [
+                        { name: { $regex: search, $options: 'i' } },
+                        { title: { $regex: search, $options: 'i' } },
+                        { description: { $regex: search, $options: 'i' } },
+                    ]
+                })
+                    .populate('gallery')
+                    .populate('client', 'fullname email phone image');
+            }else{
+                categories = await Category.find({ [searchby]: { $regex: search, $options: 'i' } })
                 .populate('gallery')
                 .populate('client', 'fullname email phone image');
+            }
         }else{
             categories = await Category.find({})
                 .populate('gallery')
@@ -37,7 +63,7 @@ const list = async (req, res) => {
         limit ? categories = categories.slice(offset, offset + limit) : '';
         res.status(200).json(response('success', 'All categories are fetched!', { categories, total, pages }))
     } catch (error) {
-        res.status(500).json(response('error', 'Something Went wrong while fetching categories. Try agin later'))
+        res.status(500).json(response('error', 'Something Went wrong while fetching categories. Try agin later ' + error.message))
     }
 }
 
@@ -201,6 +227,7 @@ const remove = async (req, res)=>{
 const deleteMultiple = async (req, res)=>{
     try {
         const { ids } = req.body;
+        console.log(ids)
         const products = await Product.find({ category: { $in: ids } });
         if (products.length != 0) return res.status(400).json(response('error', 'Some categories are used in some products. Delete those products first.'));
         await Category.deleteMany({ _id: { $in: ids } });

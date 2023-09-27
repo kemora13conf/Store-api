@@ -33,6 +33,8 @@ const options = {
 }
 app.use(Cors(options))
 app.use('/assets', express.static(path.join(__dirname, './../Public/')));
+
+// Logging the requests
 app.use((req, res, next) => {
   console.log(
     "Coming : [ " +
