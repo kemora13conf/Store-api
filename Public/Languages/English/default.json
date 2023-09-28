@@ -38,6 +38,7 @@
     "disable": "Disable",
     "save": "Save",
     "cancel": "Cancel",
+    "back": "Back",
     "add": "Add",
     "edit": "Edit",
     "delete": "Delete",
@@ -55,6 +56,7 @@
     "confirm_delete": "Yes, delete it!",
     "cancel_delete": "No, cancel!",
     "all": "All",
+    "order_by": "Order by",
 
     "category_delete_msg": "Are you sure you want to delete this category?",
     "product_delete_msg": "Are you sure you want to delete this product?",
@@ -104,6 +106,5 @@
     "result": "result",
     "of": "of",
     "results": "results"
-
 
 }

@@ -17,22 +17,15 @@ const categoryById = async (req, res, next, id) => {
         res.status(500).json(response('error', 'Something Went wrong while fetching category. Try agin later'))
     }
 }
-function stringToAscii(str) {
-    const asciiArray = [];
-    
-    for (let i = 0; i < str.length; i++) {
-      const charCode = str.charCodeAt(i);
-      asciiArray.push(charCode);
-    }
-    
-    return asciiArray;
-  }
 
 const list = async (req, res) => {
     let { search, searchby, orderby, page, limit } = req.query;
     page = parseInt(page);
     limit = parseInt(limit);
     searchby = searchby ? searchby.toLocaleLowerCase() : 'all';
+    orderby = orderby ? orderby.toLocaleLowerCase() : 'name';
+
+    console.log(orderby)
 
     try {
         let categories = [];
@@ -46,16 +39,22 @@ const list = async (req, res) => {
                     ]
                 })
                     .populate('gallery')
-                    .populate('client', 'fullname email phone image');
+                    .populate('client', 'fullname email phone image')
+                    .collation({ locale: 'en', strength: 2 }) // make the search case insensitive
+                    .sort({ [orderby]: 'asc' }); // sort the result ascendinly
             }else{
                 categories = await Category.find({ [searchby]: { $regex: search, $options: 'i' } })
                 .populate('gallery')
-                .populate('client', 'fullname email phone image');
+                .populate('client', 'fullname email phone image')
+                .collation({ locale: 'en', strength: 2 }) // make the search case insensitive
+                .sort({ [orderby]: 'asc' }); // sort the result ascendinly
             }
         }else{
             categories = await Category.find({})
                 .populate('gallery')
-                .populate('client', 'fullname email phone image');
+                .populate('client', 'fullname email phone image')
+                .collation({ locale: 'en', strength: 2 }) // make the search case insensitive
+                .sort({ [orderby]: 'asc' }); // sort the result ascendinly
         }
         const total = categories.length;
         const pages = Math.ceil(total / limit);
