@@ -33,6 +33,8 @@
     "actions": "Actions",
     "enabled": "Enabled",
     "disabled": "Disabled",
+    "price": "Price",
+    "quantity": "Quantity",
 
     "enable": "Enable",
     "disable": "Disable",
@@ -98,6 +100,13 @@
     "order_edit_error": "Error editing order!",
     "client_edit_error": "Error editing client!",
     "user_edit_error": "Error editing user!",
+
+    "no_categories_found": "No categories found",
+    "no_products_found": "No products found",
+    "no_orders_found": "No orders found",
+    "no_clients_found": "No clients found",
+    "no_users_found": "No users found",
+
 
     "multiple_delete_msg": "Are you sure you want to delete these items?",
     "multiple_delete_success": "Items deleted successfully!",

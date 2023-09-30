@@ -6,13 +6,22 @@ const schema = new Schema({
     description: String,
     price: Number,
     quantity: Number,
+    sold: {
+        type: Number,
+        default: 0
+    },
+    client: {
+        type: ObjectId,
+        ref: "User"
+    },
     enabled: {
         type: Boolean,
         default: true
     },
     category: {
         type: ObjectId,
-        ref: "Category"
+        ref: "Category",
+        required: true
     },
     gallery: [
         {

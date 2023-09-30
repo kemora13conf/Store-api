@@ -2,7 +2,11 @@ import mongoose from 'mongoose'
 const { Schema, model, models, ObjectId } = mongoose
 
 const schema = new Schema({
-    name: String,
+    name: {
+        type: String,
+        required: true,
+        unique: true,
+    },
     title: String,
     description: String,
     enabled: {

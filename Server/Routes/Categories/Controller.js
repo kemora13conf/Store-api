@@ -1,4 +1,4 @@
-import { response } from "../../utils.js";
+import { isInArray, response } from "../../utils.js";
 import multer, { diskStorage } from 'multer';
 import path from 'path';
 import Image from "../../Models/Image.js";
@@ -24,8 +24,6 @@ const list = async (req, res) => {
     limit = parseInt(limit);
     searchby = searchby ? searchby.toLocaleLowerCase() : 'all';
     orderby = orderby ? orderby.toLocaleLowerCase() : 'name';
-
-    console.log(orderby)
 
     try {
         let categories = [];
@@ -66,19 +64,6 @@ const list = async (req, res) => {
     }
 }
 
-// check if a value is in an array
-function isInArray(value, array){
-    let flag = 0;
-    array.forEach((item, index) => {
-        if(item == value){
-            flag++;
-        }
-    })
-    if(flag != 0 ){
-        return true;
-    }
-    return false
-}
 
 const storage = diskStorage({
     destination: function (req, file, cb) {
@@ -120,6 +105,10 @@ const create = async (req, res)=>{
     try {
         const { name, title, description } = req.body;
         const { fileError, images } = req;
+
+        // check if the category name is already taken
+        const catName = await Category.findOne({ name });
+        if(catName) return res.status(400).json(response('name', 'This name is already taken. Please choose another one.'))
         
         // checking that there is nothing wrong with uploading files
         if(fileError != undefined){
@@ -167,7 +156,10 @@ const update = async (req, res) => {
         if(fileError != undefined){
             return res.status(400).json(fileError)
         }
-
+        // check if the category name is already taken
+        const catName = await Category.findOne({ name });
+        if(catName) return res.status(400).json(response('name', 'This name is already taken. Please choose another one.'))
+        
         // setling the uploaded images array
         let IMAGES = [];
         if(images.length != 0){

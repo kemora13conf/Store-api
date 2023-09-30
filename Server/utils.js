@@ -12,7 +12,23 @@ const imagesHolder = async (req, res, next) => {
     next();
 } 
 
+// check if a value is in an array
+function isInArray(value, array){
+    let flag = 0;
+    array.forEach((item, index) => {
+        if(item == value){
+            flag++;
+        }
+    })
+    if(flag != 0 ){
+        return true;
+    }
+    return false
+}
+
+
 export { 
     response,
-    imagesHolder
+    imagesHolder,
+    isInArray
 };
