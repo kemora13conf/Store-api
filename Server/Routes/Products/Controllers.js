@@ -245,6 +245,18 @@ const remove = async (req, res)=>{
         res.status(500).json(response('error', 'Something Went wrong while deleting category. Try agin later ' + error.message))
     }
 }
+
+const deleteMultiple = async (req, res)=>{
+    try {
+        const { ids } = req.body;
+        console.log(ids)
+        const products = await Product.deleteMany({ _id: { $in: ids } });
+        res.status(200).json(response('success', 'products are deleted!'))
+    } catch (error) {
+        res.status(500).json(response('error', 'Something Went wrong while deleting products. Try agin later ' + error.message))
+    }
+}
+
 export {
     productById,
     productsByCategory,
@@ -255,4 +267,5 @@ export {
     verifyUpdateInputs,
     update,
     remove,
+    deleteMultiple,
 }

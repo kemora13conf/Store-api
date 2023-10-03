@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { categoryById } from '../Categories/Controller.js';
 import { signinRequired } from "../Auth/Controller.js"
 import { imagesHolder, response } from '../../utils.js';
-import { create, list, productById, productsByCategory, remove, update, upload, verifyInputs, verifyUpdateInputs } from './Controllers.js';
+import { create, list, productById, productsByCategory, remove, deleteMultiple, update, upload, verifyInputs, verifyUpdateInputs } from './Controllers.js';
 
 const router = new Router();
 
@@ -16,6 +16,9 @@ router.get('/:productId', (req, res)=>{return res.status(200).json(response('suc
 router.get('/by-category/:categoryById', productsByCategory)
 router.post('/create', signinRequired, imagesHolder, upload.array('images'), verifyInputs, create)
 router.put('/update/:productId', signinRequired, imagesHolder, upload.array('images'), verifyUpdateInputs, update)
+
+
+router.delete('/delete-multiple', signinRequired, deleteMultiple)
 router.delete('/:productId', signinRequired, remove)
 
 export default router;
