@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import Cors from 'cors';
 import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
+import fs from 'fs';
 import Config from 'dotenv';
 Config.config();
 
@@ -48,6 +49,24 @@ app.use((req, res, next) => {
       " ]"
   );
   next();
+});
+
+// load the language to the app
+app.use((req, res, next) => {
+  let lang = req.headers.Lang || "English";
+  let langPath = path.join(__dirname, `../Public/Languages/${lang}/default.json`);
+  fs.readFile(langPath, (err, data) => {
+    if (err) {
+      res.status(500).json({
+        status: "error",
+        message: "Internal server error",
+        error: err,
+      });
+    } else {
+      req.lang = JSON.parse(data);
+      next();
+    }
+  });
 });
 
 // Importing the routes

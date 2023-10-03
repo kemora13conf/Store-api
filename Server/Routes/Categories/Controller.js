@@ -158,7 +158,7 @@ const update = async (req, res) => {
         }
         // check if the category name is already taken
         const catName = await Category.findOne({ name });
-        if(catName) return res.status(400).json(response('name', 'This name is already taken. Please choose another one.'))
+        if(catName) return res.status(400).json(response('name', req.lang.name_taken))
         
         // setling the uploaded images array
         let IMAGES = [];
@@ -235,7 +235,7 @@ const changeState = async (req, res)=>{
         const { category } = req;
         category.enabled = state;
         await category.save();
-        res.status(200).json(response('success', 'Category is enabled!', category))
+        res.status(200).json(response('success', `Category is ${state ? 'enabled' : 'disabled'}!`, category))
     } catch (error) {
         res.status(500).json(response('error', 'Something Went wrong while enabling category. Try agin later ' + error.message))
     }

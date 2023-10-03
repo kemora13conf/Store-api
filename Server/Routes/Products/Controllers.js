@@ -9,7 +9,7 @@ const productById = async (req, res, next, id)=>{
     try {
         const product = await Product.findOne({ _id: id })
         .populate('gallery')
-        .populate('client', '_id fullname email phone image')
+        .populate('client')
         .populate('category', 'name')
 
         if(!product) return res.status(404).json(response('error', 'Product not found.'))
@@ -18,6 +18,20 @@ const productById = async (req, res, next, id)=>{
     } catch (error) {
         res.status(500).json(response('error','Something went wrong while fetching product. Try again later ' + error.message))
     }
+}
+const sortByCategory = (products)=>{
+    const categories = [];
+    products.forEach(product => {
+        if(!categories.includes(product.category.name)){
+            categories.push(product.category.name);
+        }
+    });
+    categories.sort();
+    let sortedProducts = categories.map(category => {
+        return products.filter(product => product.category.name == category);
+    })
+    sortedProducts = sortedProducts.flat();
+    return sortedProducts;
 }
 const list = async (req, res) => {
     let { search, searchby, orderby, page, limit } = req.query;
@@ -29,44 +43,119 @@ const list = async (req, res) => {
         let products = [];
         if (search) {
             if(searchby == 'all'){
-                products = await Product.find({ 
-                    $or: [
-                        { name: { $regex: search, $options: 'i' } },
-                        { 'category.name': { $regex: search, $options: 'i' } },
-                        { description: { $regex: search, $options: 'i' } },
-                    ]
-                })
+                if (orderby == 'category'){
+                    products = await Product.find({ 
+                        $or: [
+                            { name: { $regex: search, $options: 'i' } },
+                            { description: { $regex: search, $options: 'i' } },
+                        ]
+                     })
                     .populate('gallery')
-                    .populate('client', '_id fullname email phone image')
+                    .populate('client')
+                    .populate('category', 'name')
+
+                    // also search by category
+                    let catProducts = await Product.find({})
+                        .populate('gallery')
+                        .populate('client')
+                        .populate('category', 'name')
+                    catProducts = catProducts.filter(product => product.category.name.includes(search))
+                    products = [...products, ...catProducts];
+                    products = sortByCategory(products);
+                }else{
+                    products = await Product.find({ 
+                        $or: [
+                            { name: { $regex: search, $options: 'i' } },
+                            { description: { $regex: search, $options: 'i' } },
+                        ]
+                    })
+                    .populate('gallery')
+                    .populate('client')
                     .populate('category', 'name')
                     .collation({ locale: 'en', strength: 2 }) // make the search case insensitive
                     .sort({ [orderby]: 'asc' }); // sort the result ascendinly
-            }else{
-                if(searchby == 'price' || searchby == 'quantity'){
-                    products = await Product.find({ [searchby]: search })
+                    // also search by category
+                    let catProducts = await Product.find({})
                         .populate('gallery')
-                        .populate('client', '_id fullname email phone image')
+                        .populate('client')
                         .populate('category', 'name')
                         .collation({ locale: 'en', strength: 2 }) // make the search case insensitive
                         .sort({ [orderby]: 'asc' }); // sort the result ascendinly
-                }else{
+                    catProducts = catProducts.filter(product => product.category.name.includes(search))
+                    products = [...products, ...catProducts];
+                }
+            }else{
+                if(searchby == 'price' || searchby == 'quantity'){ // if the search by is price or quantity
+                    if (orderby == 'category'){
+                        products = await Product.find({ [searchby]: search })
+                            .populate('gallery')
+                            .populate('client')
+                            .populate('category', 'name')
+                        products = sortByCategory(products);
+                    }else{
+                        products = await Product.find({ [searchby]: search })
+                            .populate('gallery')
+                            .populate('client')
+                            .populate('category', 'name')
+                            .collation({ locale: 'en', strength: 2 }) // make the search case insensitive
+                            .sort({ [orderby]: 'asc' }); // sort the result ascendinly
+                    }
+                }else if(searchby == 'category'){ // if the search by is category
+                    if (orderby == 'category'){
+                        products = await Product.find({})
+                            .populate('gallery')
+                            .populate('client')
+                            .populate('category', 'name')
+                        products = products.filter(product => product.category.name.includes(search))
+                        products = sortByCategory(products);
+                    }else{
+                        products = await Product.find({})
+                            .populate('gallery')
+                            .populate('client')
+                            .populate('category', 'name')
+                            .collation({ locale: 'en', strength: 2 }) // make the search case insensitive
+                            .sort({ [orderby]: 'asc' }); // sort the result ascendinly
+                        products = products.filter(product => product.category.name.includes(search))
+                    }
+                            
+                }else{ // if the search by is name or description
                     products = await Product.find({ [searchby]: { $regex: search, $options: 'i' } })
-                    .populate('gallery')
-                    .populate('client', '_id fullname email phone image')
-                    .populate('category', 'name')
-                    .collation({ locale: 'en', strength: 2 }) // make the search case insensitive
-                    .sort({ [orderby]: 'asc' }); // sort the result ascendinly
                 }
 
             }
         }else{
-            products = await Product.find()
+            if(orderby == 'category'){
+                products = await Product.find({ quantity: { $ne: 0 } })
                 .populate('gallery')
-                .populate('client', '_id fullname email phone image')
+                .populate('client')
                 .populate('category', 'name')
-                .collation({ locale: 'en', strength: 2 }) // make the search case insensitive
-                .sort({ [orderby]: 'asc' }); // sort the result ascendinly
+                products = sortByCategory(products);
+            }else{
+                products = await Product.find()
+                    .populate('gallery')
+                    .populate('client')
+                    .populate('category', 'name')
+                    .collation({ locale: 'en', strength: 2 }) // make the search case insensitive
+                    .sort({ [orderby]: 'asc' }); // sort the result ascendinly
+            }
         }
+
+        // make sure that each item of the products array is unique
+        let tempProducts = [];
+        products.forEach(product => {
+            let flag = false;
+            tempProducts.forEach(tempProduct => {
+                if(String(tempProduct._id) == String(product._id)){
+                    flag = true;
+                }
+            });
+            if(!flag){
+                tempProducts.push(product);
+            }
+        });
+        products = tempProducts;
+
+        // pagination
         const total = products.length;
         const pages = Math.ceil(total / limit);
         const offset = (page - 1) * limit;
@@ -228,7 +317,7 @@ const update = async (req, res) => {
         updated_product.gallery = [...updated_product.gallery, ...IMAGES]
         await updated_product.save()
         await updated_product.populate('gallery');
-        await updated_product.populate('client', '_id fullname email phone image');
+        await updated_product.populate('client');
         await updated_product.populate('category', 'name');
         res.status(200).json(response('success', 'Product is updated!', updated_product))
     } catch (error) {
@@ -256,6 +345,18 @@ const deleteMultiple = async (req, res)=>{
         res.status(500).json(response('error', 'Something Went wrong while deleting products. Try agin later ' + error.message))
     }
 }
+// change state
+const changeState = async (req, res)=>{
+    try {
+        const { state } = req.body;
+        const { product } = req;
+        product.enabled = state;
+        await product.save();
+        res.status(200).json(response('success', `Product is ${state ? 'enabled' : 'disabled'}!`, product))
+    } catch (error) {
+        res.status(500).json(response('error', 'Something Went wrong while enabling product. Try agin later ' + error.message))
+    }
+}
 
 export {
     productById,
@@ -267,5 +368,6 @@ export {
     verifyUpdateInputs,
     update,
     remove,
-    deleteMultiple,
+    deleteMultiple, 
+    changeState
 }

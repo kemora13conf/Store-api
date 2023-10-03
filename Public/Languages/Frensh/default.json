@@ -57,6 +57,7 @@
     "cancel_delete": "Non, annuler !",
     "all": "Tous",
     "order_by": "Trier par",
+    "name_taken": "Nom existe deja!",
 
     "category_delete_msg": "Êtes-vous sûr de vouloir supprimer cette catégorie ?",
     "product_delete_msg": "Êtes-vous sûr de vouloir supprimer ce produit ?",
