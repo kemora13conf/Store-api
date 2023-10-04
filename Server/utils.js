@@ -25,10 +25,15 @@ function isInArray(value, array){
     }
     return false
 }
-
+class httpException extends Error{
+    constructor(message){
+        super(message);
+    }
+}
 
 export { 
     response,
     imagesHolder,
-    isInArray
+    isInArray,
+    httpException
 };

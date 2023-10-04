@@ -53,14 +53,25 @@ app.use((req, res, next) => {
 
 // load the language to the app
 app.use((req, res, next) => {
-  let lang = req.headers.Lang || "English";
+  let lang = req.headers.lang || "English";
   let langPath = path.join(__dirname, `../Public/Languages/${lang}/default.json`);
   fs.readFile(langPath, (err, data) => {
     if (err) {
-      res.status(500).json({
-        status: "error",
-        message: "Internal server error",
-        error: err,
+      // if the language file not found, load the default language
+      langPath = path.join(__dirname, `../Public/Languages/English/default.json`);
+      fs.readFile(langPath, (err, data) => {
+        if (err) {
+          // if the default language file not found, return an error
+          console.log(err);
+          res.status(500).json({
+            status: "error",
+            message: "Internal server error",
+            error: err,
+          });
+        } else {
+          req.lang = JSON.parse(data);
+          next();
+        }
       });
     } else {
       req.lang = JSON.parse(data);
@@ -75,6 +86,8 @@ import authRouter from './Routes/Auth/index.js'
 import categoryRouter from './Routes/Categories/index.js'
 import productRouter from './Routes/Products/index.js'
 import { response } from './utils.js';
+import { Console } from 'console';
+import multer from 'multer';
 
 // Using the routes
 app.use('/api/auth', authRouter)
@@ -82,8 +95,19 @@ app.use('/api/clients', clientRouter)
 app.use('/api/categories', categoryRouter)
 app.use('/api/products', productRouter)
 
+// Error handling middleware
+app.use((err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    // A Multer error occurred when uploading
+    res.status(400).json(JSON.parse(err.message));
+  } else {
+    // An unknown error occurred
+    res.status(500).json(JSON.parse(err.message));
+  }
+});
+
 app.use('/*', (req, res)=>{
-    res.json(response('Not Found', 'This endpoint does not exist'))
+    res.json(response('not_found', 'This endpoint does not exist'))
 })
 
 export default app

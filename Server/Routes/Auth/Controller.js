@@ -41,7 +41,6 @@ const signin = async (req, res) => {
             "role": 1
         });
         await admin.save();
-        console.log(admin)
         console.log("Admin created successfully!")
     }
 

@@ -59,7 +59,10 @@
     "cancel_delete": "No, cancel!",
     "all": "All",
     "order_by": "Order by",
-    "name_taken": "Name already taken!",
+    "created": "Created",
+    "updated": "Updated",
+    "deleted": "Deleted",
+    "successfully": "Successfully",
 
     "category_delete_msg": "Are you sure you want to delete this category?",
     "product_delete_msg": "Are you sure you want to delete this product?",
@@ -115,6 +118,56 @@
     "showing": "Showing",
     "result": "result",
     "of": "of",
-    "results": "results"
+    "results": "results",
+
+    "choose_valid_category": "Please choose a valid category",
+
+    "data_fetched_successfully": "Data fetched successfully!",
+    
+    "taken_name": "Name already taken",
+    "taken_email": "Email already taken",
+    "taken_phone": "Phone already taken",
+    "taken_username": "Username already taken",
+    "try_again_later": "Try again later",
+    "something_wrong": "Something went wrong",
+    "fetching_data": "fetching data",
+    "fetching": "fetching",
+    "not_found": "Not found",
+    "file_format_error": "Unauthorized file format",
+    "allowed_file_types": "Allowed file types",
+    "field_required": "This field is required",
+    "image_required": "Image is required",
+    "field_length": "This field must be atleast 3 characters long",
+    "invalid_price": "Please enter a valid price.",
+    "invalid_quantity": "Please enter a valid quantity.",
+
+    "updating_category": "updating category",
+    "updating_product": "updating product",
+    "updating_order": "updating order",
+    "updating_client": "updating client",
+
+    "changing_state_of_category": "changing state of category",
+    "changing_state_of_product": "changing state of product",
+
+    "category_can_not_be_deleted": "This category is used in some products and can not be deleted",
+    "categories_can_not_be_deleted": "These categories are used in some products and can not be deleted",
+    "deleting_category": "deleting category",
+    "deleting_categories": "deleting categories",
+
+    "product_can_not_be_deleted": "This product is used in some orders and can not be deleted",
+    "products_can_not_be_deleted": "These products are used in some orders and can not be deleted",
+    "deleting_product": "deleting product",
+    "deleting_products": "deleting products",
+
+    "order_can_not_be_deleted": "This order is used in some clients and can not be deleted",
+    "orders_can_not_be_deleted": "These orders are used in some clients and can not be deleted",
+    "deleting_order": "deleting order",
+    "deleting_orders": "deleting orders",
+    
+
+    "client_can_not_be_deleted": "This client is used in some orders and can not be deleted",
+    "clients_can_not_be_deleted": "These clients are used in some orders and can not be deleted",
+    "deleting_client": "deleting client",
+    "deleting_clients": "deleting clients"
 
 }
