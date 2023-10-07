@@ -26,13 +26,15 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // Handling midlwares
-app.use(express.json())
+app.use(express.json()) // parsing all the comming requests's body from json.npm run dev
 const options = {
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: '*'
 }
 app.use(Cors(options))
+
+// assets
 app.use('/assets', express.static(path.join(__dirname, './../Public/')));
 
 // Logging the requests
@@ -100,9 +102,6 @@ app.use((err, req, res, next) => {
   if (err instanceof multer.MulterError) {
     // A Multer error occurred when uploading
     res.status(400).json(JSON.parse(err.message));
-  } else {
-    // An unknown error occurred
-    res.status(500).json(JSON.parse(err.message));
   }
 });
 

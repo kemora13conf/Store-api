@@ -18,24 +18,98 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 const clientById = async (req, res, next, clientId)=>{
-    const client = await Client.findById(clientId);
-    if (!client) return res.status(400).json(response('error', 'Client not found'))
-    client.password = null;
-    client.salt = null;
-    req.client = client;
-    next();
+    const { lang } = req;
+    try{
+        const client = await Client.findById(clientId);
+        if (!client) 
+            return res
+                    .status(400)
+                    .json(response("error", lang.client + " " + lang.not_found + "!"));
+        client.password = null;
+        client.salt = null;
+        req.client = client;
+        next();
+    } catch (error) {
+        res
+        .status(500)
+        .json(
+            response(
+            "error",
+            lang.something_wrong +
+                " " +
+                lang.fetching +
+                " " +
+                lang.product +
+                ". " +
+                lang.try_again_later +
+                " " +
+                error.message
+            )
+        );
+    }
 }
 
-const all = async (req, res)=>{
-    console.log(path.join(path.resolve(),'Public/Profile-images'))
+const list = async (req, res)=>{
+    const { lang } = req;
+    let { search, searchby, orderby, page, limit } = req.query;
+    page = parseInt(page);
+    limit = parseInt(limit);
+    searchby = searchby ? searchby.toLocaleLowerCase() : "all";
+    orderby = orderby ? orderby.toLocaleLowerCase() : "fullname";
+    
     try {
-        const clients = await Client.find({});
-        res.status(200).json(response('success', 'All client are fetched!', clients))
+        let clients = [];
+        if(search){
+            if(searchby == 'all'){
+                clients = await Client.find({ 
+                    $or: [
+                        { fullname: { $regex: search, $options: 'i' } },
+                        { email: { $regex: search, $options: 'i' } },
+                        { phone: { $regex: search, $options: 'i' } },
+                    ]
+                })
+            }else{
+                clients = await Client.find({ [searchby]: { $regex: search, $options: 'i' } })
+            }
+        }else{
+            clients = await Client.find()
+        }
+        if (orderby == "fullname") {
+            clients.sort((a, b) => {
+                if (a.fullname < b.fullname) return -1;
+                if (a.fullname > b.fullname) return 1;
+                return 0;
+            });
+        } else if (orderby == "email") {
+            clients.sort((a, b) => {
+                if (a.email < b.email) return -1;
+                if (a.email > b.email) return 1;
+                return 0;
+            });
+        } else if (orderby == "phone") {
+            clients.sort((a, b) => {
+                if (a.phone < b.phone) return -1;
+                if (a.phone > b.phone) return 1;
+                return 0;
+            });
+        }
+        
+        const total = clients.length;
+        const pages = Math.ceil(total / limit);
+        const offset = (page - 1) * limit;
+        limit ? (clients = clients.slice(offset, offset + limit)) : "";
+        res.status(200).json(
+        response("success", lang.data_fetched_successfully, {
+            clients,
+            total,
+            pages,
+        })
+        );
     } catch (err) {
         res.status(500).json(
             response(
                 'error',
-                'Something Went wrong while fetching user. Try agin later'
+                'Something Went wrong while fetching user. Try agin later. ' + err.message
             )
         )
     }
@@ -149,7 +223,7 @@ const updateLanguage = async (req, res)=>{
 
 export { 
     clientById,
-    all, 
+    list, 
     create, 
     verifyInputs, 
     upload, 
