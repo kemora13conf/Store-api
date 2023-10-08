@@ -171,6 +171,8 @@
     "client_can_not_be_deleted": "This client is used in some orders and can not be deleted",
     "clients_can_not_be_deleted": "These clients are used in some orders and can not be deleted",
     "deleting_client": "deleting client",
-    "deleting_clients": "deleting clients"
+    "deleting_clients": "deleting clients",
+
+    "no_permission": "You don't have permission to do this"
 
 }

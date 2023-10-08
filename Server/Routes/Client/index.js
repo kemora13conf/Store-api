@@ -8,13 +8,15 @@ const router = new Router();
 router.param('clientId', clientById)
 
 // Declaring the routes
-router.get('/', list)
+router.get('/', signinRequired, list)
 router.post('/', upload.single('image'), verifyInputs, create)
-router.put('/:clientId', signinRequired, upload.single('image'), verifyUPdateInputs, update)
-router.get('/:clientId', client)
+
+// update theme and language for the current user
 router.put('/update-theme', signinRequired, updateTheme)
 router.put('/update-language', signinRequired, updateLanguage)
 
+router.put('/:clientId', signinRequired, upload.single('image'), verifyUPdateInputs, update)
+router.get('/:clientId', client)
 
 
 export default router;

@@ -9,6 +9,7 @@ const schema = new Schema({
         minLength: 3,
         maxLength: 20,
     },
+    code: Buffer,
 })
 
-export default models.Permissions || model("Permissions", schema)
+export default models.Permissions || model("Permissions", schema);

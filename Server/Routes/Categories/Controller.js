@@ -143,9 +143,11 @@ const verifyInputs = (req, res, next) => {
   next();
 };
 const create = async (req, res) => {
+  const { lang, currentUser } = req;
+  if(!currentUser.can_create_category()) return res.status(401).json(response('error', lang.no_permission))
   try {
     const { name, title, description } = req.body;
-    const { lang, images } = req;
+    const { images } = req;
 
     // check if the category name is already taken
     const catName = await Category.findOne({ name });
@@ -209,7 +211,8 @@ const verifyUpdateInputs = (req, res, next) => {
   next();
 };
 const update = async (req, res) => {
-  const { lang } = req;
+  const { lang, currentUser } = req;
+  if(!currentUser.can_edit_category()) return res.status(401).json(response('error', lang.no_permission))
   try {
     let { name, title, description, remove } = req.body;
     const { category, images } = req;
@@ -252,7 +255,7 @@ const update = async (req, res) => {
     updated_category.gallery = [...updated_category.gallery, ...IMAGES];
 
     await updated_category.populate("gallery");
-    await updated_category.kind();
+    await updated_category;
     await updated_category.save();
     res
       .status(200)
@@ -282,10 +285,12 @@ const update = async (req, res) => {
 
 // delete category
 const remove = async (req, res) => {
-  const { lang } = req;
+  const { lang, currentUser } = req;
+  if(!currentUser.can_delete_category()) return res.status(401).json(response('error', lang.no_permission))
+  
   try {
     const { category } = req;
-    const products = await Product.find({ category: category._id }).kind();
+    const products = await Product.find({ category: category._id });
     if (products.length != 0)
       return res
         .status(400)
@@ -310,10 +315,12 @@ const remove = async (req, res) => {
 
 // delete multiple categories
 const deleteMultiple = async (req, res) => {
-    const { lang } = req;
+  const { lang, currentUser } = req;
+  if(!currentUser.can_delete_category()) return res.status(401).json(response('error', lang.no_permission))
+
   try {
     const { ids } = req.body;
-    const products = await Product.find({ category: { $in: ids } }).kind();
+    const products = await Product.find({ category: { $in: ids } });
     if (products.length != 0)
       return res
         .status(400)
@@ -343,7 +350,9 @@ const deleteMultiple = async (req, res) => {
 
 // change state
 const changeState = async (req, res) => {
-    const { lang } = req;
+  const { lang, currentUser } = req;
+  if(!currentUser.can_edit_category()) return res.status(401).json(response('error', lang.no_permission))
+  
   try {
     const { state } = req.body;
     const { category } = req;

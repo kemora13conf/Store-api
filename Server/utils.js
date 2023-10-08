@@ -1,3 +1,6 @@
+import Client from "./Models/Client.js";
+import Permissions from "./Models/Permissions.js";
+
 const response = (type, message, other=null)=>{
     let obj = {
         type: type,
@@ -31,9 +34,105 @@ class httpException extends Error{
     }
 }
 
+async function initPermissions (req, res, next) {
+    const permissions = await Permissions.find();
+    const permissions_object = [
+        {
+            type: "create_category",
+            code: Buffer.from("create_category", 'hex'),
+        },
+        {
+            type: "edit_category",
+            code: Buffer.from("edit_category", 'hex'),
+        },
+        {
+            type: "delete_category",
+            code: Buffer.from("delete_category", 'hex'),
+        },
+        {
+            type: "create_product",
+            code: Buffer.from("create_product", 'hex'),
+        },
+        {
+            type: "edit_product",
+            code: Buffer.from("edit_product", 'hex'),
+        },
+        {
+            type: "delete_product",
+            code: Buffer.from("delete_product", 'hex'),
+        },
+        {
+            type: "create_order",
+            code: Buffer.from("create_order", 'hex'),
+        },
+        {
+            type: "edit_order",
+            code: Buffer.from("edit_order", 'hex'),
+        },
+        {
+            type: "delete_order",
+            code: Buffer.from("delete_order", 'hex'),
+        },
+        {
+            type: "create_client",
+            code: Buffer.from("create_client", 'hex'),
+        },
+        {
+            type: "edit_client",
+            code: Buffer.from("edit_client", 'hex'),
+        },
+        {
+            type: "delete_client",
+            code: Buffer.from("delete_client", 'hex'),
+        },
+        {
+            type: "edit_settings",
+            code: Buffer.from("edit_settings", 'hex'),
+        }
+        
+    ];
+    if (permissions.length != permissions_object.length) {
+        try {
+            // delete all permissions
+            await Permissions.deleteMany({});
+            // Create default permission records if none exist
+            let pers = await Permissions.create(permissions_object);
+            next();
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    next();
+};
+async function initAdmin(req, res, next){
+    const admin = await Client.findOne({ role: 1 });
+    if(!admin){
+        try {
+            const adminPermissions = await Permissions.find({});
+            const admin = await new Client({
+                "fullname": "Abdelghani el mouak",
+                "email": "abdelghani@gmail.com",
+                "phone": "0653179026",
+                "password": "secret",
+                "role": 1,
+                "permissions": adminPermissions
+            });
+            await admin.save();
+            next();
+        }
+        catch(error){
+            console.log(error);
+        }
+    }
+    next();
+}
+
+
 export { 
     response,
     imagesHolder,
     isInArray,
-    httpException
+    httpException,
+    initPermissions,
+    initAdmin
 };

@@ -87,11 +87,13 @@ import clientRouter from './Routes/Client/index.js'
 import authRouter from './Routes/Auth/index.js'
 import categoryRouter from './Routes/Categories/index.js'
 import productRouter from './Routes/Products/index.js'
-import { response } from './utils.js';
+import { initAdmin, initPermissions, response } from './utils.js';
 import { Console } from 'console';
 import multer from 'multer';
 
 // Using the routes
+app.use(initPermissions)
+app.use(initAdmin)
 app.use('/api/auth', authRouter)
 app.use('/api/clients', clientRouter)
 app.use('/api/categories', categoryRouter)

@@ -284,9 +284,10 @@ const verifyInputs = async (req, res, next) => {
   next();
 };
 const create = async (req, res) => {
-  const { lang } = req;
+  const { lang, currentUser } = req;
+  if(!currentUser.can_create_product()) return res.status(401).json(response('error', lang.no_permission))
+
   try {
-    sdkjfdf();
     const { name, description, price, quantity, category } = req.body;
     const { fileError, images } = req;
 
@@ -371,7 +372,9 @@ const verifyUpdateInputs = async (req, res, next) => {
   next();
 };
 const update = async (req, res) => {
-    const { lang } = req;
+  const { lang, currentUser } = req;
+  if(!currentUser.can_edit_product()) return res.status(401).json(response('error', lang.no_permission))
+
   try {
     const { name, description, price, quantity, category, remove } = req.body;
     const { product, images } = req;
@@ -434,7 +437,8 @@ const update = async (req, res) => {
 };
 
 const remove = async (req, res) => {
-  const { lang } = req;
+  const { lang, currentUser } = req;
+  if(!currentUser.can_delete_product()) return res.status(401).json(response('error', lang.no_permission))
   try {
     const { product } = req;
     await product.deleteOne({ _id: product._id });
@@ -461,7 +465,8 @@ const remove = async (req, res) => {
 };
 
 const deleteMultiple = async (req, res) => {
-  const { lang } = req;
+  const { lang, currentUser } = req;
+  if(!currentUser.can_delete_product()) return res.status(401).json(response('error', lang.no_permission))
   try {
     const { ids } = req.body;
     console.log(ids);
@@ -489,7 +494,9 @@ const deleteMultiple = async (req, res) => {
 };
 // change state
 const changeState = async (req, res) => {
-  const { lang } = req;
+  const { lang, currentUser } = req;
+  if(!currentUser.can_edit_product()) return res.status(401).json(response('error', lang.no_permission))
+  
   try {
     const { state } = req.body;
     const { product } = req;

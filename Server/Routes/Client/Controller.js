@@ -18,6 +18,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 const clientById = async (req, res, next, clientId)=>{
+    console.log(clientId)
     const { lang } = req;
     try{
         const client = await Client.findById(clientId);
@@ -137,6 +138,8 @@ const verifyInputs = async (req, res, next)=>{
     next();
 }
 const create = async (req, res)=>{
+    const { lang, currentUser } = req;
+    if(!currentUser.can_edit_client()) return res.status(401).json(response('error', lang.no_permission))
     try {
         const client = await new Client(req.body);
         await client.save();

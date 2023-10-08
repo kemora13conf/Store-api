@@ -67,6 +67,7 @@ schema.pre('save', function(next) {
     }
     next();
   });
+
 schema.methods = {
     // Method to compare and authenticate the password
     authenticate: function(text) {
