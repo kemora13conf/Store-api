@@ -88,7 +88,7 @@ import authRouter from './Routes/Auth/index.js'
 import categoryRouter from './Routes/Categories/index.js'
 import productRouter from './Routes/Products/index.js'
 import { initAdmin, initPermissions, response } from './utils.js';
-import { Console } from 'console';
+import settigs from './Routes/Settings/index.js';
 import multer from 'multer';
 
 // Using the routes
@@ -98,6 +98,7 @@ app.use('/api/auth', authRouter)
 app.use('/api/clients', clientRouter)
 app.use('/api/categories', categoryRouter)
 app.use('/api/products', productRouter)
+app.use('/api/settings', settigs)
 
 // Error handling middleware
 app.use((err, req, res, next) => {

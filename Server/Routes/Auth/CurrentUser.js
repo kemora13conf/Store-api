@@ -69,6 +69,11 @@ class CurrentUser{
         if(this.permissions.includes('delete_client')) return true;
         return false;
     }
+    can_edit_settings(){
+        if(this.role != 1) return false;
+        if(this.permissions.includes('edit_settings')) return true;
+        return false;
+    }
 }
 
 export default CurrentUser;

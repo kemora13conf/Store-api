@@ -90,6 +90,18 @@ const list = async (req, res) => {
       );
   }
 };
+const category = (req, res) => {
+  const { lang } = req;
+  return res
+    .status(200)
+    .json(
+      response(
+        "success",
+        `${lang.category} ${lang.fetched} ${lang.successfully}`,
+        req.category
+      )
+    );
+};
 
 const storage = diskStorage({
   destination: function (req, file, cb) {
@@ -108,11 +120,9 @@ const storage = diskStorage({
     if (!isInArray(ext.toLocaleLowerCase(), ALLOWEDEXT)) {
       const error = response(
         "file",
-        req.lang.file_format_error +
-          ". " +
-          req.lang.allowed_file_types +
-          ": " +
-          ALLOWEDEXT.join(", ")
+        `${lang.file_format_error}. ${
+          lang.allowed_file_types
+        }: ${ALLOWEDEXT.join(", ")}`
       );
       return cb(new httpException(JSON.stringify(error)), false);
     }
@@ -144,7 +154,8 @@ const verifyInputs = (req, res, next) => {
 };
 const create = async (req, res) => {
   const { lang, currentUser } = req;
-  if(!currentUser.can_create_category()) return res.status(401).json(response('error', lang.no_permission))
+  if (!currentUser.can_create_category())
+    return res.status(401).json(response("error", lang.no_permission));
   try {
     const { name, title, description } = req.body;
     const { images } = req;
@@ -212,7 +223,8 @@ const verifyUpdateInputs = (req, res, next) => {
 };
 const update = async (req, res) => {
   const { lang, currentUser } = req;
-  if(!currentUser.can_edit_category()) return res.status(401).json(response('error', lang.no_permission))
+  if (!currentUser.can_edit_category())
+    return res.status(401).json(response("error", lang.no_permission));
   try {
     let { name, title, description, remove } = req.body;
     const { category, images } = req;
@@ -286,8 +298,9 @@ const update = async (req, res) => {
 // delete category
 const remove = async (req, res) => {
   const { lang, currentUser } = req;
-  if(!currentUser.can_delete_category()) return res.status(401).json(response('error', lang.no_permission))
-  
+  if (!currentUser.can_delete_category())
+    return res.status(401).json(response("error", lang.no_permission));
+
   try {
     const { category } = req;
     const products = await Product.find({ category: category._id });
@@ -299,24 +312,25 @@ const remove = async (req, res) => {
     res.status(200).json(response("success", "Category is deleted!"));
   } catch (error) {
     res
-    .status(500)
-    .json(
-      response(
-        "error",
-        lang.something_wrong +
-          " " +
-          lang.deleting_category +
-          ". " +
-          error.message
-      )
-    );
+      .status(500)
+      .json(
+        response(
+          "error",
+          lang.something_wrong +
+            " " +
+            lang.deleting_category +
+            ". " +
+            error.message
+        )
+      );
   }
 };
 
 // delete multiple categories
 const deleteMultiple = async (req, res) => {
   const { lang, currentUser } = req;
-  if(!currentUser.can_delete_category()) return res.status(401).json(response('error', lang.no_permission))
+  if (!currentUser.can_delete_category())
+    return res.status(401).json(response("error", lang.no_permission));
 
   try {
     const { ids } = req.body;
@@ -324,21 +338,23 @@ const deleteMultiple = async (req, res) => {
     if (products.length != 0)
       return res
         .status(400)
-        .json(
-          response(
-            "error",
-            lang.categories_can_not_be_deleted
-          )
-        );
+        .json(response("error", lang.categories_can_not_be_deleted));
     await Category.deleteMany({ _id: { $in: ids } });
-    res.status(200).json(response("success", lang.categories+' '+lang.deleted+' '+lang.successfully+'!'));
+    res
+      .status(200)
+      .json(
+        response(
+          "success",
+          lang.categories + " " + lang.deleted + " " + lang.successfully + "!"
+        )
+      );
   } catch (error) {
     res
       .status(500)
       .json(
         response(
           "error",
-            lang.something_wrong +
+          lang.something_wrong +
             " " +
             lang.deleting_categories +
             ". " +
@@ -351,8 +367,9 @@ const deleteMultiple = async (req, res) => {
 // change state
 const changeState = async (req, res) => {
   const { lang, currentUser } = req;
-  if(!currentUser.can_edit_category()) return res.status(401).json(response('error', lang.no_permission))
-  
+  if (!currentUser.can_edit_category())
+    return res.status(401).json(response("error", lang.no_permission));
+
   try {
     const { state } = req.body;
     const { category } = req;
@@ -363,7 +380,9 @@ const changeState = async (req, res) => {
       .json(
         response(
           "success",
-          `${lang.category} ${state ? lang.enabled : lang.disabled} ${lang.successfully}!`,
+          `${lang.category} ${state ? lang.enabled : lang.disabled} ${
+            lang.successfully
+          }!`,
           category
         )
       );
@@ -373,7 +392,7 @@ const changeState = async (req, res) => {
       .json(
         response(
           "error",
-            lang.something_wrong +
+          lang.something_wrong +
             " " +
             lang.changing_state_of_category +
             ". " +
@@ -386,6 +405,7 @@ const changeState = async (req, res) => {
 export {
   categoryById,
   list,
+  category,
   upload,
   verifyInputs,
   create,
