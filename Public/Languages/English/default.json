@@ -38,6 +38,7 @@
     "disabled": "Disabled",
     "price": "Price",
     "quantity": "Quantity",
+    "role": "Role",
 
     "enable": "Enable",
     "disable": "Disable",
@@ -129,6 +130,7 @@
     
     "taken_name": "Name already taken",
     "taken_email": "Email already taken",
+    "invalid_email": "Invalid email address",
     "taken_phone": "Phone already taken",
     "taken_username": "Username already taken",
     "try_again_later": "Try again later",
@@ -141,6 +143,7 @@
     "field_required": "This field is required",
     "image_required": "Image is required",
     "field_length": "This field must be atleast 3 characters long",
+    "password_length": "Password must be atleast 6 characters long",
     "invalid_price": "Please enter a valid price.",
     "invalid_quantity": "Please enter a valid quantity.",
 

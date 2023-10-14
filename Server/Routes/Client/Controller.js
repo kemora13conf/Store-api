@@ -1,19 +1,37 @@
-import { response } from "../../utils.js"
+import { httpException, response } from "../../utils.js"
 import Client from '../../Models/Client.js'
 import multer from "multer";
 import path from "path";
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, path.join(path.resolve(),'Public/Profile-images'));
+        cb(null, path.join(path.resolve(),'Public/Clients-images'));
     },
     filename: function (req, file, cb) {
-        // get the file extension
-        const ext = file.originalname.split('.')[1];
-        const fileName = Date.now() + '.' + ext;
-        if (fileName) req.body.image = fileName;
+        const { lang } = req;
+        const ALLOWEDEXT = ["png", "jpg", "jpeg", "webp"];
+    
+        // separating the name from the extension.
+        const nameArr = file.originalname.split("."); // array: [name, ext]
+        const ext = nameArr[nameArr.length - 1]; // extension
+    
+        // checking the allowed filetypes
+        if (!isInArray(ext.toLocaleLowerCase(), ALLOWEDEXT)) {
+          const error = response(
+            "file",
+            lang.file_format_error +
+              ". " +
+              lang.allowed_file_types +
+              ": " +
+              ALLOWEDEXT.join(", ")
+          );
+          return cb(new httpException(JSON.stringify(error)), false);
+        }
+    
+        const fileName = "Clients-" + Date.now() + "." + ext;
+        req.body.image = fileName;
         cb(null, fileName);
-    }
+    },
 });
 const upload = multer({ storage: storage });
 
@@ -122,28 +140,38 @@ function isEmail(email) {
 }
 
 const verifyInputs = async (req, res, next)=>{
-    const { fullname, email, phone, password, re_password } = req.body;
-    if (!fullname) return res.status(400).json(response('fullname', 'This field is required'))
-    if (!email) return res.status(400).json(response('email', 'This field is required'))
-    if (!phone) return res.status(400).json(response('phone', 'This field is required'))
-    if (!password) return res.status(400).json(response('password', 'This field is required'))
-    if (!re_password) return res.status(400).json(response('re_password', 'This field is required'))
-    if(fullname.length < 3 || fullname.length > 20) return res.status(400).json(response('fullname', 'Fullname must be between 3 and 20 characters'))
-    if(phone.length < 9 || phone.length > 15) return res.status(400).json(response('phone', 'Please enter a valid phone number'))
-    if(password.length < 6 || password.length > 20) return res.status(400).json(response('password', 'Password must be between 6 and 20 characters'))
-    if(password !== re_password) return res.status(400).json(response('re_password', 'Password does not match'))
-    if (!isEmail(email)) return res.status(400).json(response('email', 'Invalid email address'))
+    const { lang } = req;
+    const { fullname, email, phone, password } = req.body;
+    if (!fullname)
+        return res.status(400).json(response('fullname', lang.field_required))
+    if (!email)
+        return res.status(400).json(response('email', lang.field_required))
+    if (!phone)
+        return res.status(400).json(response('phone', lang.field_required))
+    if (!password)
+        return res.status(400).json(response('password', lang.field_required))
+
+    if(fullname.length < 3 || fullname.length > 60)
+        return res.status(400).json(response('fullname', lang.field_length))
+    if(phone.length < 9 || phone.length > 15)
+        return res.status(400).json(response('phone', 'Please enter a valid phone number'))
+    if(password.length < 6 || password.length > 60)
+        return res.status(400).json(response('password', lang.password_length))
+    if (!isEmail(email))
+        return res.status(400).json(response('email', lang.invalid_email))
     const client = await Client.findOne({ email });
-    if (client) return res.status(400).json(response('email', 'Email already exists'))
+    if (client)
+        return res.status(400).json(response('email', lang.taken_email))
     next();
 }
 const create = async (req, res)=>{
     const { lang, currentUser } = req;
-    if(!currentUser.can_edit_client()) return res.status(401).json(response('error', lang.no_permission))
+    if(!currentUser.can_create_client()) return res.status(401).json(response('error', lang.no_permission))
     try {
         const client = await new Client(req.body);
         await client.save();
-        res.status(200).json(response('success', 'New Account created', client))
+        await client.populate('permissions');
+        res.status(200).json(response('success', 'New Account created', client));
     } catch (err) {
         res.status(500).json(
             response(
@@ -168,9 +196,14 @@ const verifyUPdateInputs = async (req, res, next)=>{
     next();
 };
 const update = async (req, res)=>{
+    const { lang, currentUser } = req;
+    if(!currentUser.can_edit_client()) return res.status(401).json(response('error', lang.no_permission))
     if (req.body.image == 'null') delete req.body.image;
     try {
-        const client = await Client.findOneAndUpdate({ _id: req.client._id }, req.body, { new: true });
+        const client = await Client
+                                .findOneAndUpdate({ _id: req.client._id }, req.body, { new: true })
+                                .populate('permissions', 'type')
+        ;
         res.status(200).json(response('success', 'Your Account updated', client))
     } catch (err) {
         res.status(500).json(
@@ -223,6 +256,7 @@ const updateLanguage = async (req, res)=>{
         )
     }
 }
+
 
 export { 
     clientById,
