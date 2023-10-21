@@ -7,10 +7,6 @@ const schema = new Schema({
     product: {
         type: ObjectId,
         ref: "Product"
-    },
-    order: {
-        type: ObjectId,
-        ref: "Order"
     }
 },
 {

@@ -3,7 +3,10 @@ const { Schema, model, models, ObjectId } = mongoose
 
 const schema = new Schema({
     transaction_id: String,
-    paid: Boolean,
+    paid: {
+        type: Boolean,
+        default: false
+    },
     amount: Number,
     status: {
         type: ObjectId,

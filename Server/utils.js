@@ -1,5 +1,6 @@
 import Client from "./Models/Client.js";
 import Permissions from "./Models/Permissions.js";
+import Status from "./Models/Status.js";
 
 const response = (type, message, other=null)=>{
     let obj = {
@@ -104,6 +105,34 @@ async function initPermissions (req, res, next) {
     }
     next();
 };
+async function initStatus (req, res, next) {
+    const status = await Status.find();
+    const status_object = [
+        {
+            name: "Dellivered",
+        },
+        {
+            name: "Not Processed",
+        },
+        {
+            name: "Under Process",
+        },
+        {
+            name: "Cancelled",
+        }
+    ];
+    if (status.length != status_object.length) {
+        try {
+            // delete all permissions
+            await Status.deleteMany({});
+            // Create default permission records if none exist
+            let pers = await Status.create(status_object);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    next();
+}
 async function initAdmin(req, res, next){
     const admin = await Client.findOne({ role: 1 });
     if(!admin){
@@ -134,5 +163,6 @@ export {
     isInArray,
     httpException,
     initPermissions,
+    initStatus,
     initAdmin
 };
