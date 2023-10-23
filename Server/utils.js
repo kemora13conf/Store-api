@@ -109,7 +109,7 @@ async function initStatus (req, res, next) {
     const status = await Status.find();
     const status_object = [
         {
-            name: "Dellivered",
+            name: "Delivered",
         },
         {
             name: "Not Processed",

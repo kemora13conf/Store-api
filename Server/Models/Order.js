@@ -10,7 +10,10 @@ const schema = new Schema({
     amount: Number,
     status: {
         type: ObjectId,
-        ref: "Status"
+        ref: "Status",
+        default: {
+            name: "Not Processed"
+        }
     },
     client: {
         type: ObjectId,

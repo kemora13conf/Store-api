@@ -4,7 +4,7 @@ const { Schema, model, models, ObjectId } = mongoose
 const schema = new Schema({
     name: {
         type: String,
-        enum: ["Cancelled", "Dellivered", "Not Processed", "Under Process"]
+        enum: ["Cancelled", "Delivered", "Not Processed", "Under Process"]
     }
 },
 {

@@ -11,7 +11,7 @@ const signinRequired = async (req, res, next) => {
     if (!token) return res.status(401).json(response('no_login', 'You must be logged in to access this route'))
     try {
         const { _id } = jwt.verify(token, process.env.JWT_SECRET);
-        let currentUser = await Client.findById(_id).populate('permissions', 'type');
+        let currentUser = await Client.findById(_id).populate('permissions', 'type').populate('image');
         if (!currentUser || currentUser.role == 0) return res.status(401).json(response('no_login', 'You must be logged in to access this route'))
         currentUser = new CurrentUser(currentUser);
         req.currentUser = currentUser;

@@ -71,13 +71,7 @@ const list = async (req, res) => {
               model: "Product",
             },
           })
-          .populate({
-            path: "client",
-            populate: {
-                path: "image",
-                model: "Image"
-            }
-          })
+          .populate('client', 'fullname image email')
           .collation({ locale: "en", strength: 2 }) // make the search case insensitive
           .sort({ [orderby]: "asc" }); // sort the result ascendinly
       } else {
@@ -92,13 +86,7 @@ const list = async (req, res) => {
               model: "Product",
             },
           })
-          .populate({
-            path: "client",
-            populate: {
-                path: "image",
-                model: "Image"
-            }
-          })
+          .populate('client', 'fullname image email')
           .collation({ locale: "en", strength: 2 }) // make the search case insensitive
           .sort({ [orderby]: "asc" }); // sort the result ascendinly
       }
@@ -112,13 +100,7 @@ const list = async (req, res) => {
             model: "Product",
           },
         })
-        .populate({
-          path: "client",
-          populate: {
-              path: "image",
-              model: "Image"
-          }
-        })
+        .populate('client', 'fullname image email')
         .sort({ [orderby]: "asc" }); // sort the result ascendinly
     }
         
@@ -133,6 +115,24 @@ const list = async (req, res) => {
         pages,
       })
     );
+  } catch (error) {
+    res
+      .status(500)
+      .json(
+        response(
+          "error",
+          lang.something_wrong + " " + lang.fetching_data + ". " + error.message
+        )
+      );
+  }
+};
+const stateList = async (req, res) => {
+  const { lang } = req;
+  try {
+    const states = await Status.find();
+    return res
+      .status(200)
+      .json(response("success", lang.data_fetched_successfully, states));
   } catch (error) {
     res
       .status(500)
@@ -229,9 +229,10 @@ const create = async (req, res) => {
   let fakeItems = [];
   for (let j = 0; j < 3; j++) {
     // You can adjust the number of items you want
+    console.log(productsIds[Math.floor(Math.random() * productsIds.length)])
     const fakeItem = new Item({
       amount: faker.number.int({ min: 1, max: 1000 }),
-      product: productsIds[Math.floor(Math.random * productsIds.length)], // You should replace this with a valid ObjectId from your database
+      product: productsIds[Math.floor(Math.random() * productsIds.length)], // You should replace this with a valid ObjectId from your database
       quantity: faker.number.int({ min: 1, max: 10 }),
     });
     fakeItems.push(fakeItem);
@@ -243,7 +244,7 @@ const create = async (req, res) => {
     transaction_id: faker.string.alpha(10),
     paid: faker.datatype.boolean(),
     amount: faker.number.int({ min: 1, max: 1000 }),
-    status: statusIds[Math.floor(Math.random * statusIds.length)], // You should replace this with a valid ObjectId from your database
+    status: statusIds[Math.floor(Math.random() * statusIds.length)], // You should replace this with a valid ObjectId from your database
     client: "6522e4d4d0cee50b1e9cc0bb", // You should replace this with a valid ObjectId from your database
     items: fakeItems,
   });
@@ -253,4 +254,4 @@ const create = async (req, res) => {
     .json(response("success", "Orders created successfully.", order));
 };
 
-export { orderById, list, ordersByProduct, remove, ordersByClient, create };
+export { orderById, list, ordersByProduct, remove, ordersByClient, create, stateList };
