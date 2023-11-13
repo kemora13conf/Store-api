@@ -32,64 +32,62 @@ const orderById = async (req, res, next, id) => {
   }
 };
 
-// const list = async (req, res) => {
-//     try {
-//         const orders = await Order.find()
-//                             .populate('status')
-//                             .populate({
-//                                 path: 'items',
-//                                 populate: {
-//                                     path: 'product',
-//                                     model: 'Product'
-//                                 }
-//                             });
-//         return res.status(200).json(response('success', 'Orders fetched successfully.', orders))
-//     } catch (error) {
-//         res.status(500).json(response('error','Something went wrong while fetching orders. Try again later.'))
-//     }
-// }
-
 const list = async (req, res) => {
   const { lang } = req;
-  let { search, searchby, orderby, page, limit } = req.query;
+  let { orderby, page, limit } = req.query;
   page = parseInt(page);
   limit = parseInt(limit);
-  searchby = searchby ? searchby.toLocaleLowerCase() : "all";
-  orderby = orderby ? orderby.toLocaleLowerCase() : "amount";
-
+  orderby = orderby ? orderby : lang.date;
   try {
     let orders = [];
-    if (search) {
-      if (searchby == "all") {
-        orders = await Order.find({
+    if (orderby === lang.amount) {
+      orders = await Order.find()
+        .populate("status")
+        .populate({
+          path: "items",
+          populate: {
+            path: "product",
+            model: "Product",
+          },
         })
-          .populate("status")
-          .populate({
-            path: "items",
-            populate: {
-              path: "product",
-              model: "Product",
-            },
-          })
-          .populate('client', 'fullname image email')
-          .collation({ locale: "en", strength: 2 }) // make the search case insensitive
-          .sort({ [orderby]: "asc" }); // sort the result ascendinly
-      } else {
-        orders = await Order.find({
-          [searchby]: { $regex: search, $options: "i" },
+        .populate("client", "fullname image email")
+        .sort({ amount: -1 });
+    } else if (orderby === lang.date) {
+      orders = await Order.find()
+        .populate("status")
+        .populate({
+          path: "items",
+          populate: {
+            path: "product",
+            model: "Product",
+          },
         })
-          .populate("status")
-          .populate({
-            path: "items",
-            populate: {
-              path: "product",
-              model: "Product",
-            },
-          })
-          .populate('client', 'fullname image email')
-          .collation({ locale: "en", strength: 2 }) // make the search case insensitive
-          .sort({ [orderby]: "asc" }); // sort the result ascendinly
-      }
+        .populate("client", "fullname image email")
+        .sort({ createdAt: -1 });
+    } else if (orderby === lang.status) {
+      orders = await Order.find()
+      .populate("status")
+      .populate({
+        path: "items",
+        populate: {
+          path: "product",
+          model: "Product",
+        },
+      })
+      .populate("client", "fullname image email")
+      
+      let statusOrder = await Status.find({}); // You should replace this with a valid ObjectId from your database
+      statusOrder = statusOrder
+                      .map((status) => status.name)
+                      .sort((a, b) => a.localeCompare(b));
+  
+      const ordersArr = [];
+      statusOrder.forEach((status) => {
+        const order = orders.filter((order) => order.status.name === status);
+        ordersArr.push(...order);
+      });
+      orders = ordersArr;
+
     } else {
       orders = await Order.find()
         .populate("status")
@@ -100,10 +98,8 @@ const list = async (req, res) => {
             model: "Product",
           },
         })
-        .populate('client', 'fullname image email')
-        .sort({ [orderby]: "asc" }); // sort the result ascendinly
+        .populate("client", "fullname image email");
     }
-        
     const total = orders.length;
     const pages = Math.ceil(total / limit);
     const offset = (page - 1) * limit;
@@ -126,6 +122,7 @@ const list = async (req, res) => {
       );
   }
 };
+
 const stateList = async (req, res) => {
   const { lang } = req;
   try {
@@ -145,80 +142,6 @@ const stateList = async (req, res) => {
   }
 };
 
-const ordersByProduct = async (req, res) => {
-  const { product } = req;
-  try {
-    const orders = await Order.find({
-      items: { $elemMatch: { product: product } },
-    })
-      .populate("status")
-      .populate({
-        path: "items",
-        populate: {
-          path: "product",
-          model: "Product",
-        },
-      });
-    return res
-      .status(200)
-      .json(response("success", "Orders fetched successfully.", orders));
-  } catch (error) {
-    res
-      .status(500)
-      .json(
-        response(
-          "error",
-          "Something went wrong while fetching orders. Try again later."
-        )
-      );
-  }
-};
-const ordersByClient = async (req, res) => {
-  const { client } = req;
-  try {
-    const orders = await Order.find({ client: client })
-      .populate("status")
-      .populate({
-        path: "items",
-        populate: {
-          path: "product",
-          model: "Product",
-        },
-      });
-    return res
-      .status(200)
-      .json(response("success", "Orders fetched successfully.", orders));
-  } catch (error) {
-    res
-      .status(500)
-      .json(
-        response(
-          "error",
-          "Something went wrong while fetching orders. Try again later."
-        )
-      );
-  }
-};
-
-const remove = async (req, res) => {
-  try {
-    const order = req.order;
-    await Order.deleteOne({ _id: order._id });
-    return res
-      .status(200)
-      .json(response("success", "Order deleted successfully."));
-  } catch (error) {
-    res
-      .status(500)
-      .json(
-        response(
-          "error",
-          "Something went wrong while deleting order. Try again later."
-        )
-      );
-  }
-};
-
 const create = async (req, res) => {
   const fakeOrders = [];
   let statusIds = await Status.find({}); // You should replace this with a valid ObjectId from your database
@@ -229,7 +152,6 @@ const create = async (req, res) => {
   let fakeItems = [];
   for (let j = 0; j < 3; j++) {
     // You can adjust the number of items you want
-    console.log(productsIds[Math.floor(Math.random() * productsIds.length)])
     const fakeItem = new Item({
       amount: faker.number.int({ min: 1, max: 1000 }),
       product: productsIds[Math.floor(Math.random() * productsIds.length)], // You should replace this with a valid ObjectId from your database
@@ -245,13 +167,90 @@ const create = async (req, res) => {
     paid: faker.datatype.boolean(),
     amount: faker.number.int({ min: 1, max: 1000 }),
     status: statusIds[Math.floor(Math.random() * statusIds.length)], // You should replace this with a valid ObjectId from your database
-    client: "6522e4d4d0cee50b1e9cc0bb", // You should replace this with a valid ObjectId from your database
+    client: "654e378cbf5e6950b63c1830", // You should replace this with a valid ObjectId from your database
     items: fakeItems,
   });
-    await order.save();
+  await order.save();
   return res
     .status(200)
     .json(response("success", "Orders created successfully.", order));
 };
 
-export { orderById, list, ordersByProduct, remove, ordersByClient, create, stateList };
+const update_status = async (req, res) => {
+  const { order, lang, currentUser } = req;
+  if (!currentUser.can_edit_order()){
+    return res.status(401).json(response("error", lang.no_permission));
+  }
+  const { status } = req.body;
+  try {
+    const statusId = await Status.findOne({name: status})
+    if(!statusId) return res.status(400).json(response('error', lang.status_not_found))
+    const newOrder = await Order.findOneAndUpdate(
+      { _id: order._id },
+      { status: statusId },
+      { new: true }
+    )
+    .populate("status");
+    return res
+      .status(200)
+      .json(
+        response(
+          "success",
+          `${lang.order} ${lang.updated} ${lang.successfully}`,
+          newOrder
+        )
+      );
+  } catch (error) {
+    res
+      .status(500)
+      .json(
+        response(
+          "error",
+          lang.something_wrong +
+            " " +
+            lang.updating +
+            " " +
+            lang.order +
+            ". " +
+            error.message
+        )
+      );
+  }
+};
+
+const deleteMultiple = async (req, res) => {const { lang, currentUser } = req;
+  if (!currentUser.can_delete_order())
+    return res.status(401).json(response("error", lang.no_permission));
+
+  try {
+    const { ids } = req.body;
+    const orders = await Order.deleteMany({ _id: { $in: ids } });
+    return res
+      .status(200)
+      .json(
+        response(
+          "success",
+          `${lang.order} ${lang.deleted} ${lang.successfully}`,
+          orders
+        )
+      );
+  } catch (error) {
+    res
+      .status(500)
+      .json(
+        response(
+          "error",
+          `${lang.something_wrong} ${lang.deleting} ${lang.order}. ${error.message}`
+        )
+      );
+  }
+};
+
+export {
+  orderById,
+  list,
+  create,
+  stateList,
+  update_status,
+  deleteMultiple,
+};
