@@ -36,17 +36,9 @@ const schema = new Schema({
         type: Number,
         default: 0,
     },
-    theme:{
-        type: String,
-        default: 'light',
-    },
     status:{
         type: Number,
         default: 0,
-    },
-    language:{
-        type: String,
-        default: 'English',
     },
     permissions: [
         {
@@ -54,6 +46,10 @@ const schema = new Schema({
             ref: "Permissions"
         }
     ],
+    settings: {
+        type: ObjectId,
+        ref: "Settings"
+    },
 },
 {
     timestamps: true

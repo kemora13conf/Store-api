@@ -3,6 +3,7 @@ import Client from "../../Models/Client.js";
 import multer from "multer";
 import path from "path";
 import Permissions from "../../Models/Permissions.js";
+import Settings from "../../Models/Settings.js";
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -290,15 +291,11 @@ const updateTheme = async (req, res) => {
   if(!currentUser.can_edit_client())
     return res.status(401).json(response("error", lang.no_permission));
   try {
-    const client = await Client.findOneAndUpdate(
-      { _id: currentUser._id },
-      { theme: req.body.theme },
-      { new: true }
-    );
+    const settings = await Settings.findOneAndUpdate({ _id: currentUser.settings }, { theme: req.body.theme }, { new: true });
     res
       .status(200)
       .json(
-        response("success", `${lang.theme} ${lang.updated}!`, client.theme)
+        response("success", `${lang.theme} ${lang.updated}!`, settings.theme)
       );
   } catch (err) {
     res
@@ -317,14 +314,10 @@ const updateLanguage = async (req, res) => {
   if(!currentUser.can_edit_client())
     return res.status(401).json(response("error", lang.no_permission));
   try {
-    const client = await Client.findOneAndUpdate(
-      { _id: currentUser._id },
-      { language: req.body.language },
-      { new: true }
-    );
+    const settings = await Settings.findOneAndUpdate({ _id: currentUser.settings }, { language: req.body.language }, { new: true });
     res
       .status(200)
-      .json(response("success", `${lang.language} ${lang.updated} ${lang.successfully}!`, client.language));
+      .json(response("success", `${lang.language} ${lang.updated} ${lang.successfully}!`, settings.language));
   } catch (err) {
     res
       .status(500)
