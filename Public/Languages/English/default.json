@@ -223,5 +223,11 @@
     "no_permission": "You don't have permission to do this",
     "not_allowed": "not allowed",
 
-    "data_updated_successfully": "Data updated successfully!"
+    "data_updated_successfully": "Data updated successfully!",
+
+    "total_categories": "Total Categories",
+    "total_products": "Total Products",
+    "total_orders": "Total Orders",
+    "total_clients": "Total Clients"
+    
 }

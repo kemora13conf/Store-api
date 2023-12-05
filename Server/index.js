@@ -90,6 +90,7 @@ import productRouter from './Routes/Products/index.js'
 import orderRouter from './Routes/Orders/index.js'
 import { initAdmin, initPermissions, initStatus, response } from './utils.js';
 import settigs from './Routes/Settings/index.js';
+import Analytics from './Routes/Analytics/index.js';
 import multer from 'multer';
 
 // Using the routes
@@ -97,6 +98,7 @@ app.use(initPermissions)
 app.use(initAdmin)
 app.use(initStatus)
 app.use('/api/auth', authRouter)
+app.use('/api/analytics', Analytics)
 app.use('/api/clients', clientRouter)
 app.use('/api/categories', categoryRouter)
 app.use('/api/products', productRouter)
