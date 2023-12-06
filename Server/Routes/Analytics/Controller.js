@@ -32,5 +32,52 @@ const total = async (req, res) => {
       );
   }
 };
+const order_per_month = async (req, res) => {
+  let { lang, year } = req;
+  
+  try {
+    let orders = await Order.aggregate([
+      {
+        $match: {
+          createdAt: {
+            $gte: new Date(`${year}-01-01T00:00:00.000Z`),
+            $lt: new Date(`${year}-12-31T23:59:59.999Z`),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: { $month: "$createdAt" },
+          total: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          month: "$_id",
+          total: 1,
+          _id: 0,
+        },
+      },
+      {
+        $sort: { month: 1 },
+      },
+    ]);
+    res.status(200).json(
+      response("success", lang.data_fetched_successfully, {
+        orders,
+      })
+    );
+  } catch (error) {
+    res
+      .status(400)
+      .json(
+        response(
+          "error",
+          `${lang.something_wrong} ${lang.fetching} ${lang.data}!`,
+          error
+        )
+      );
+  }
+};
 
-export { total };
+export { total, order_per_month };

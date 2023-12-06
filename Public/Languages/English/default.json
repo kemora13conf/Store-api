@@ -228,6 +228,12 @@
     "total_categories": "Total Categories",
     "total_products": "Total Products",
     "total_orders": "Total Orders",
-    "total_clients": "Total Clients"
-    
+    "total_clients": "Total Clients",
+
+    "orders_per_month": "Orders per month",
+
+    "months_arr": [
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct",
+        "Nov", "Dec"
+    ] 
 }
