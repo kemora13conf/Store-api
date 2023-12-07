@@ -231,6 +231,10 @@
     "total_clients": "Total Clients",
 
     "orders_per_month": "Orders per month",
+    "revenue_per_month": "Revenue per month",
+    "recent_orders": "Recent Orders",
+    "orders_by_status": "Orders by status",
+    "view_all": "View All",
 
     "months_arr": [
         "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct",
